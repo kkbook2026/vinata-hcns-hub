@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VINATA HCNS HUB</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/msal-browser/3.26.1/msal-browser.min.js" crossorigin="anonymous"></script>
+<script>(function(){var u=["https://alcdn.msauth.net/browser/3.26.1/js/msal-browser.min.js","https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.26.1/lib/msal-browser.min.js","https://unpkg.com/@azure/msal-browser@3.26.1/lib/msal-browser.min.js","https://cdnjs.cloudflare.com/ajax/libs/msal-browser/3.26.1/msal-browser.min.js"],i=0;function n(){if(window.msal||i>=u.length)return;var s=document.createElement("script");s.src=u[i++];s.onerror=n;s.onload=function(){if(!window.msal)n();};document.head.appendChild(s);}n();})();</script>
 <style>
 :root{--navy:#1F3A5F;--teal:#0E7C86;--bg:#F4F6F9;--card:#fff;--line:#E1E6EE;--txt:#1b2330;--mut:#667085;--red:#D92D20;--amb:#F79009;--yel:#EAAA08;--grn:#12B76A;--blue:#2E90FA}
 *{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
@@ -172,7 +172,7 @@ async function getToken(){if(!msalApp||!ACCOUNT)return null;try{const r=await ms
 async function graph(path,opt={}){const t=await getToken();if(!t)throw new Error("Chưa có token");const r=await fetch("https://graph.microsoft.com/v1.0"+path,{...opt,headers:{Authorization:"Bearer "+t,...(opt.headers||{})}});if(r.status===404)return null;if(!r.ok)throw new Error("Graph "+r.status+" "+(await r.text()).slice(0,200));const ct=r.headers.get("content-type")||"";return ct.includes("json")?r.json():r.text();}
 async function m365Login(){
  const msg=document.getElementById("ssoMsg");msg.textContent="";
- if(!window.msal){msg.textContent="Không tải được thư viện đăng nhập Microsoft (cần internet).";return;}
+ for(let w=0;w<20&&!window.msal;w++){msg.textContent="Đang tải thư viện đăng nhập Microsoft...";await new Promise(r=>setTimeout(r,500));} if(!window.msal){msg.textContent="Không tải được thư viện đăng nhập Microsoft - mạng đang chặn alcdn.msauth.net / jsdelivr / unpkg / cdnjs. Báo IT mở 1 trong các địa chỉ này.";return;}
  if(!cfgOK()){msg.textContent="HUB chưa được đăng ký với Microsoft 365. IT chạy Register-HCNS-HubApp.ps1 để cấu hình.";return;}
  try{
   if(!msalApp){msalApp=new msal.PublicClientApplication({auth:{clientId:HUBCFG.clientId,authority:"https://login.microsoftonline.com/"+HUBCFG.tenantId,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"sessionStorage"}});await msalApp.initialize();}
