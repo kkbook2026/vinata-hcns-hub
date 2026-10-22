@@ -182,7 +182,7 @@ async function m365Login(){
   // 1. Nhóm bảo mật -> quyền
   let groups=[];try{const g=await graph("/me/memberOf?$select=displayName&$top=999");groups=(g&&g.value||[]).map(x=>x.displayName||"").filter(n=>n.startsWith("SG-HCNS-"));}catch(e){}
   // 2. Đồng bộ trạng thái dùng chung từ SharePoint (CSDL chính) trước khi xác định người dùng
-  if(HUBCFG.sharedState&&HUBCFG.siteHost&&!HUBCFG.siteHost.startsWith("__")){try{await pullState();}catch(e){toast("Không đọc được dữ liệu dùng chung: "+e.message);}}
+  if(HUBCFG.sharedState&&HUBCFG.siteHost&&!HUBCFG.siteHost.startsWith("__")){try{if(!HUBCFG.driveId){const st=await graph(`/sites/${HUBCFG.siteHost}:${HUBCFG.sitePath}`);const dr=await graph(`/sites/${st.id}/drive`);HUBCFG.driveId=dr.id;}await pullState();}catch(e){toast("Không đọc được dữ liệu dùng chung: "+e.message);}}
   // 3. Tên trong ma trận (email map lấy từ CSDL dùng chung, dự phòng từ mã)
   const EM=Object.assign({},EMAIL_MAP,S.emailMap||{});
   let u=Object.keys(EM).find(k=>EM[k]&&EM[k].toLowerCase()===upn);
@@ -192,7 +192,7 @@ async function m365Login(){
   login(u,{upn,name:acc.name,groups});
  }catch(e){msg.textContent="Đăng nhập thất bại: "+(e.errorMessage||e.message);SSO=false;}
 }
-function drivePath(file){return `/sites/${HUBCFG.siteHost}:${HUBCFG.sitePath}:/drive/root:/${HUBCFG.backupFolder}/${file}`;}
+function drivePath(file){return `/drives/${HUBCFG.driveId}/root:/${HUBCFG.backupFolder}/${file}`;}
 async function pullState(){const remote=await graph(drivePath(HUBCFG.stateFile)+":/content");if(remote&&remote.matrix&&remote.expiries){if(!S.savedAt||(remote.savedAt||"")>S.savedAt){const keepMe=ME;S=remote;save();toast("Đã tải dữ liệu dùng chung từ SharePoint ("+new Date(remote.savedAt).toLocaleString("vi")+")");}}}
 async function pushState(dated){if(!SSO)return;S.savedAt=new Date().toISOString();S.savedBy=ME;localStorage.setItem(KEY,JSON.stringify(S));const body=JSON.stringify(S);await graph(drivePath(HUBCFG.stateFile)+":/content",{method:"PUT",headers:{"Content-Type":"application/json"},body});if(dated){await graph(drivePath(`VINATA-HCNS-HUB-backup-${S.savedAt.replace(/[:T]/g,"-").slice(0,16)}.json`)+":/content",{method:"PUT",headers:{"Content-Type":"application/json"},body});S.lastBackup=S.savedAt;}}
 function scheduleSync(){if(!SSO||!HUBCFG.sharedState)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>pushState(false).then(()=>{const el=document.getElementById("syncDot");if(el)el.textContent="☁ đã đồng bộ "+new Date().toLocaleTimeString("vi");}).catch(e=>toast("Đồng bộ SharePoint lỗi: "+e.message)),8000);}
