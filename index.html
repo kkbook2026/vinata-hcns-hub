@@ -11,7 +11,7 @@
 #login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--teal))}
 .lbox{background:#fff;border-radius:14px;padding:32px;width:min(760px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .lbox h1{margin:0 0 4px;color:var(--navy);font-size:24px}.lbox p{margin:0 0 18px;color:var(--mut)}
-.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}h
 .pbtn{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
 .pbtn:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(14,124,134,.2);transform:translateY(-2px)}
 .pbtn b{display:block;color:var(--navy)}.pbtn small{color:var(--mut)}
@@ -163,7 +163,7 @@ function role(u){return (USERS.find(x=>x[0]===u)||[])[1]||"";}
 
 
 /* ====================== MICROSOFT 365 (Entra ID) ====================== */
-const HUBCFG={tenantId:"__TENANT_ID__",clientId:"__CLIENT_ID__",siteHost:"vinatacomvn.sharepoint.com",sitePath:"/sites/ADM-HR",backupFolder:"HCNS-BACKUP",stateFile:"VINATA-HCNS-HUB-state.json",allowLocalLogin:false,sharedState:true,publicBuild:true};
+const HUBCFG={tenantId:"5f32d071-2928-4036-aefa-81ba5c560201",clientId:"a9b2e58e-064c-427b-b8b4-af6707196ccd",siteHost:"vinatacomvn.sharepoint.com",sitePath:"/sites/ADM-HR",backupFolder:"HCNS-BACKUP",stateFile:"VINATA-HCNS-HUB-state.json",allowLocalLogin:false,sharedState:true,publicBuild:true};
 const EMAIL_MAP={"TUẤN":"vuminhtuan@vinata.com.vn","A.DIÊN":"thaidoandien@vinata.com.vn","H.THỦY":"nguyenhuongthuy@vinata.com.vn","MINH":"trinhhoangminh@vinata.com.vn","ĐIỂN":"nguyenduydien@vinata.com.vn","LIÊM":"hoanghuongliem@vinata.com.vn","NGUYỆT":"nguyenbichnguyet@vinata.com.vn","HOA":"buihoa@vinata.com.vn","LIÊN":"lephuonglien@vinata.com.vn","LONG":"caothanglong@vinata.com.vn","THẮNG":"tranvanthang@vinata.com.vn","SÂM":"phamsam@vinata.com.vn","NHUNG":"hongnhung@vinata.com.vn","THÚY":"nguyenthanhthuy@vinata.com.vn","NỤ":"","THẮM":""};
 const SCOPES=["User.Read","GroupMember.Read.All","Sites.ReadWrite.All"];
 let msalApp=null,ACCOUNT=null,SSO=false,syncTimer=null;
