@@ -7,3 +7,5 @@ Hosting: GitHub Pages, custom domain `www.hub.vinata.com.vn` (file CNAME).
 Cấu hình Entra: chạy `Register-HCNS-HubApp.ps1 -HubUrl https://www.hub.vinata.com.vn/` rồi thay `__TENANT_ID__` / `__CLIENT_ID__` trong index.html (script tự sinh bản .configured.html - đổi tên thành index.html).
 
 Bản quyền: Nguyễn Duy Điển - VINATA International Co., Ltd.
+
+Deploy: GitHub Pages - 22/10/2026.
