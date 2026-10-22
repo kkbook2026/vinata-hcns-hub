@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VINATA HCNS HUB</title>
+<title>VINATA ADM-HR HUB</title>
 <script>(function(){var u=["https://alcdn.msauth.net/browser/3.26.1/js/msal-browser.min.js","https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.26.1/lib/msal-browser.min.js","https://unpkg.com/@azure/msal-browser@3.26.1/lib/msal-browser.min.js","https://cdnjs.cloudflare.com/ajax/libs/msal-browser/3.26.1/msal-browser.min.js"],i=0;function n(){if(window.msal||i>=u.length)return;var s=document.createElement("script");s.src=u[i++];s.onerror=n;s.onload=function(){if(!window.msal)n();};document.head.appendChild(s);}n();})();</script>
 <style>
 :root{--navy:#1F3A5F;--teal:#0E7C86;--bg:#F4F6F9;--card:#fff;--line:#E1E6EE;--txt:#1b2330;--mut:#667085;--red:#D92D20;--amb:#F79009;--yel:#EAAA08;--grn:#12B76A;--blue:#2E90FA}
 *{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
 #login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--teal))}
-.lbox{background:#fff;border-radius:14px;padding:32px;width:min(760px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.lbox h1{margin:0 0 4px;color:var(--navy);font-size:24px}.lbox p{margin:0 0 18px;color:var(--mut)}
+.lbox{background:#fff;border-radius:8px;padding:40px 44px;width:min(440px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.lbox h1{margin:0 0 4px;color:var(--navy);font-size:22px}.lbox p{margin:0 0 16px;color:var(--mut);font-size:13px}
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}h
 .pbtn{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
 .pbtn:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(14,124,134,.2);transform:translateY(-2px)}
@@ -65,19 +65,19 @@ textarea{width:100%;min-height:90px}
 </head>
 <body>
 <div id="login"><div class="lbox">
- <h1>VINATA HCNS HUB</h1><p>Công cụ vận hành phòng Hành chính - Nhân sự, phân quyền theo ma trận chức năng F01-F12 và nhóm bảo mật Microsoft 365.</p>
- <div id="ssoBox" style="text-align:center;padding:18px;border:1px solid #E1E6EE;border-radius:12px;margin-bottom:14px">
-  <button class="btn" style="font-size:15px;padding:12px 22px" onclick="m365Login()">🔐 Đăng nhập bằng tài khoản Office 365 (@vinata.com.vn)</button>
-  <p class="muted" style="margin:10px 0 0">Dùng đúng email, mật khẩu và xác thực 2 lớp của Microsoft 365. HUB không lưu mật khẩu. Quyền lấy từ nhóm SG-HCNS-* và ma trận F01-F12.</p>
+ <h1>VINATA ADM-HR HUB</h1><p>Công cụ vận hành phòng Hành chính - Nhân sự, phân quyền theo chức năng và bảo mật Microsoft 365.</p>
+ <div id="ssoBox" style="text-align:center;margin:8px 0 14px">
+  <button class="btn" style="font-size:14px;padding:11px 18px;width:100%" onclick="m365Login()">Đăng nhập bằng tài khoản Email VINATA</button>
+  <p class="muted" style="margin:10px 0 0">Dùng đúng email, mật khẩu và xác thực 2 lớp của Microsoft 365.</p>
   <p id="ssoMsg" class="muted" style="margin:6px 0 0;color:#B42318"></p>
  </div>
  <details id="localBox"><summary class="muted" style="cursor:pointer">Chế độ ngoại tuyến / khẩn cấp (chỉ IT bật)</summary><div class="people" id="people" style="margin-top:10px"></div></details>
- <p class="muted" style="margin-top:14px">Bản 1.3 web - trang này chỉ chứa mã chương trình, không chứa dữ liệu. Toàn bộ dữ liệu nằm trên SharePoint ADM-HR/HCNS-BACKUP và chỉ được tải về sau khi đăng nhập Office 365 thành công. Bản quyền: Nguyễn Duy Điển - VINATA International Co., Ltd.</p>
+ <p class="muted" style="margin-top:14px">Bản 1.3 web - trang này chỉ chứa mã chương trình, không chứa dữ liệu. Toàn bộ dữ liệu nằm trên SharePoint ADM-HR/HCNS-BACKUP và chỉ được tải về sau khi đăng nhập Office 365 thành công. Bản quyền: Phòng HCNS - Công ty TNHH Quốc Tế VINATA</p>
 </div></div>
 
 <div id="app">
  <div class="side">
-  <div class="brand"><b>VINATA HCNS HUB</b><small>Phòng Hành chính - Nhân sự</small></div>
+  <div class="brand"><b>VINATA ADM-HR HUB</b><small>Phòng Hành chính - Nhân sự</small></div>
   <div class="me" id="me"></div>
   <div class="nav" id="nav"></div>
  </div>
