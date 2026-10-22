@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VINATA HCNS HUB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/msal-browser/3.26.1/msal-browser.min.js" crossorigin="anonymous"></script>
+<style>
+:root{--navy:#1F3A5F;--teal:#0E7C86;--bg:#F4F6F9;--card:#fff;--line:#E1E6EE;--txt:#1b2330;--mut:#667085;--red:#D92D20;--amb:#F79009;--yel:#EAAA08;--grn:#12B76A;--blue:#2E90FA}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--teal))}
+.lbox{background:#fff;border-radius:14px;padding:32px;width:min(760px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.lbox h1{margin:0 0 4px;color:var(--navy);font-size:24px}.lbox p{margin:0 0 18px;color:var(--mut)}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pbtn{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
+.pbtn:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(14,124,134,.2);transform:translateY(-2px)}
+.pbtn b{display:block;color:var(--navy)}.pbtn small{color:var(--mut)}
+#app{display:none;min-height:100vh}
+.side{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--navy);color:#fff;overflow-y:auto}
+.brand{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.12)}.brand b{font-size:16px;display:block}.brand small{opacity:.75}
+.me{padding:12px 16px;background:rgba(255,255,255,.08);font-size:13px}.me b{display:block}.me small{opacity:.8}
+.nav a{display:flex;gap:10px;align-items:center;padding:10px 16px;color:#dfe7f3;text-decoration:none;font-size:13.5px;border-left:3px solid transparent}
+.nav a:hover,.nav a.on{background:rgba(255,255,255,.1);color:#fff;border-left-color:#5cd6e0}
+.nav .grp{padding:12px 16px 4px;font-size:11px;letter-spacing:.08em;opacity:.6;text-transform:uppercase}
+.main{margin-left:240px;padding:22px 26px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.top h2{margin:0;color:var(--navy);font-size:21px}
+.btn{border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;background:var(--teal);color:#fff}
+.btn.sec{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.dan{background:var(--red)}.btn.sm{padding:4px 9px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card .v{font-size:26px;font-weight:700;color:var(--navy)}.card .l{color:var(--mut);font-size:12.5px}
+.card.r .v{color:var(--red)}.card.a .v{color:var(--amb)}.card.g .v{color:var(--grn)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.panel h3{margin:0 0 10px;font-size:15px;color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;background:#F0F3F8;color:#344054;padding:8px;border-bottom:1px solid var(--line);font-weight:600;white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid #EEF1F5;vertical-align:top}tr:hover td{background:#FAFBFD}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11.5px;font-weight:600}
+.t-red{background:#FEE4E2;color:#B42318}.t-amb{background:#FEF0C7;color:#B54708}.t-yel{background:#FEFBE8;color:#854D0E}.t-grn{background:#D1FADF;color:#027A48}.t-blu{background:#D1E9FF;color:#175CD3}.t-gry{background:#EAECF0;color:#475467}
+.perm{display:inline-block;width:26px;text-align:center;border-radius:6px;font-weight:700;font-size:12px;padding:2px 0}
+.pA{background:#1F3A5F;color:#fff}.pE{background:#0E7C86;color:#fff}.pC{background:#D1E9FF;color:#175CD3}.pV{background:#EAECF0;color:#475467}.p-{color:#bbb}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid #9ad7dc;border-color:var(--teal)}
+textarea{width:100%;min-height:90px}
+.modal{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:center;justify-content:center;z-index:50}
+.modal.on{display:flex}.mbox{background:#fff;border-radius:14px;width:min(720px,94vw);max-height:92vh;overflow:auto;padding:22px}
+.mbox h3{margin:0 0 12px;color:var(--navy)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid2 label,.g1 label{display:block;font-size:12px;color:var(--mut);margin-bottom:3px}
+.grid2 input,.grid2 select,.g1 input,.g1 select{width:100%}
+.g1{margin-bottom:8px}
+.muted{color:var(--mut);font-size:12.5px}
+.toast{position:fixed;right:20px;bottom:20px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.3s;z-index:60}
+.toast.on{opacity:1}
+.steps li{padding:6px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px;align-items:flex-start}
+.steps li.done{opacity:.55;text-decoration:line-through}
+.chip{display:inline-block;background:#EEF4FF;color:var(--navy);border-radius:6px;padding:2px 7px;font-size:11.5px;margin:2px 2px 0 0}
+.bar{height:8px;background:#EAECF0;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--teal)}
+.hint{background:#EEF8F9;border-left:4px solid var(--teal);padding:10px 12px;border-radius:6px;font-size:12.5px;margin-bottom:12px}
+.pre{white-space:pre-wrap;font-family:Consolas,monospace;font-size:12px;background:#F7F8FA;border:1px solid var(--line);padding:10px;border-radius:8px;max-height:320px;overflow:auto}
+.sens{filter:blur(4px);user-select:none}
+@media print{.side,.top .btn,.noprint{display:none!important}.main{margin:0}}
+@media(max-width:900px){.side{width:200px}.main{margin-left:200px;padding:14px}}
+</style>
+</head>
+<body>
+<div id="login"><div class="lbox">
+ <h1>VINATA HCNS HUB</h1><p>Công cụ vận hành phòng Hành chính - Nhân sự, phân quyền theo ma trận chức năng F01-F12 và nhóm bảo mật Microsoft 365.</p>
+ <div id="ssoBox" style="text-align:center;padding:18px;border:1px solid #E1E6EE;border-radius:12px;margin-bottom:14px">
+  <button class="btn" style="font-size:15px;padding:12px 22px" onclick="m365Login()">🔐 Đăng nhập bằng tài khoản Office 365 (@vinata.com.vn)</button>
+  <p class="muted" style="margin:10px 0 0">Dùng đúng email, mật khẩu và xác thực 2 lớp của Microsoft 365. HUB không lưu mật khẩu. Quyền lấy từ nhóm SG-HCNS-* và ma trận F01-F12.</p>
+  <p id="ssoMsg" class="muted" style="margin:6px 0 0;color:#B42318"></p>
+ </div>
+ <details id="localBox"><summary class="muted" style="cursor:pointer">Chế độ ngoại tuyến / khẩn cấp (chỉ IT bật)</summary><div class="people" id="people" style="margin-top:10px"></div></details>
+ <p class="muted" style="margin-top:14px">Bản 1.3 web - trang này chỉ chứa mã chương trình, không chứa dữ liệu. Toàn bộ dữ liệu nằm trên SharePoint ADM-HR/HCNS-BACKUP và chỉ được tải về sau khi đăng nhập Office 365 thành công. Bản quyền: Nguyễn Duy Điển - VINATA International Co., Ltd.</p>
+</div></div>
+
+<div id="app">
+ <div class="side">
+  <div class="brand"><b>VINATA HCNS HUB</b><small>Phòng Hành chính - Nhân sự</small></div>
+  <div class="me" id="me"></div>
+  <div class="nav" id="nav"></div>
+ </div>
+ <div class="main" id="main"></div>
+</div>
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================== CẤU HÌNH NỀN ====================== */
+const USERS=[
+ ["TUẤN","GM - Trưởng phòng"],["A.DIÊN","Manager - Đoàn thể, ATLĐ"],["H.THỦY","Manager - NNN, ISO, Đào tạo, BH"],["MINH","Manager - Dịch thuật, Xe, Media, CĐS"],
+ ["ĐIỂN","Manager - IT & Chuyển đổi số"],["LIÊM","Senior - HĐLĐ, Lương"],["NGUYỆT","Senior - Văn thư, BHXH"],["HOA","Senior - Chấm công, Chi phí VP"],
+ ["LIÊN","Senior - Hỗ trợ người Nhật"],["LONG","Senior - IT"],["THẮNG","Senior - IT"],["SÂM","Senior - Tuyển dụng, Lễ tân"],
+ ["NHUNG","Staff - DOCO, Allocation, Media"],["THÚY","Staff - Hỗ trợ NNN, DOCO"],["NỤ","Service - Phục vụ VP"],["THẮM","Service - Phục vụ VP"]];
+const FUNCS={F01:"Pháp chế",F02:"Tuyển dụng",F03:"Hồ sơ NS & Lương",F04:"Chấm công & Phân bổ",F05:"Kiểm soát tài liệu (DOCO)",F06:"Văn thư & Lưu trữ",F07:"ISO & Đào tạo",F08:"Người nước ngoài",F09:"Bảo hiểm",F10:"Hành chính tổng hợp",F11:"Đoàn thể & An toàn",F12:"IT & Chuyển đổi số"};
+const MATRIX_DEFAULT={
+ "TUẤN":{F01:"A",F02:"A",F03:"A",F04:"A",F05:"A",F06:"A",F07:"A",F08:"A",F09:"A",F10:"A",F11:"A",F12:"A"},
+ "A.DIÊN":{F01:"E",F02:"V",F03:"V",F04:"A",F05:"V",F06:"V",F07:"V",F08:"V",F09:"V",F10:"A",F11:"A",F12:"V"},
+ "H.THỦY":{F01:"V",F02:"E",F03:"V",F04:"V",F05:"V",F06:"E",F07:"A",F08:"A",F09:"A",F10:"E",F11:"E",F12:"V"},
+ "MINH":{F01:"V",F02:"V",F03:"V",F04:"V",F05:"V",F06:"V",F07:"V",F08:"E",F09:"E",F10:"A",F11:"E",F12:"A"},
+ "ĐIỂN":{F01:"V",F02:"V",F03:"V",F04:"V",F05:"V",F06:"V",F07:"V",F08:"V",F09:"V",F10:"V",F11:"V",F12:"A"},
+ "LIÊM":{F01:"V",F02:"E",F03:"E",F04:"V",F05:"V",F06:"C",F07:"V",F08:"V",F09:"V",F10:"V",F11:"V",F12:"V"},
+ "NGUYỆT":{F01:"V",F02:"E",F03:"E",F04:"V",F05:"V",F06:"E",F07:"E",F08:"V",F09:"C",F10:"E",F11:"V",F12:"V"},
+ "HOA":{F01:"V",F02:"V",F03:"V",F04:"E",F05:"E",F06:"E",F07:"V",F08:"V",F09:"V",F10:"E",F11:"C",F12:"V"},
+ "LIÊN":{F01:"V",F02:"V",F03:"V",F04:"V",F05:"V",F06:"V",F07:"V",F08:"E",F09:"V",F10:"E",F11:"V",F12:"V"},
+ "LONG":{F01:"V",F02:"V",F03:"V",F04:"V",F05:"V",F06:"V",F07:"V",F08:"V",F09:"V",F10:"V",F11:"V",F12:"E"},
+ "THẮNG":{F01:"V",F02:"V",F03:"V",F04:"V",F05:"V",F06:"V",F07:"V",F08:"V",F09:"V",F10:"V",F11:"V",F12:"E"},
+ "SÂM":{F01:"V",F02:"E",F03:"V",F04:"V",F05:"V",F06:"C",F07:"E",F08:"V",F09:"V",F10:"E",F11:"C",F12:"V"},
+ "NHUNG":{F01:"V",F02:"V",F03:"V",F04:"E",F05:"E",F06:"V",F07:"C",F08:"C",F09:"C",F10:"E",F11:"C",F12:"V"},
+ "THÚY":{F01:"-",F02:"V",F03:"-",F04:"V",F05:"C",F06:"V",F07:"V",F08:"C",F09:"V",F10:"C",F11:"V",F12:"V"},
+ "NỤ":{F01:"-",F02:"-",F03:"-",F04:"V",F05:"-",F06:"V",F07:"-",F08:"-",F09:"-",F10:"C",F11:"V",F12:"V"},
+ "THẮM":{F01:"-",F02:"-",F03:"-",F04:"V",F05:"-",F06:"V",F07:"-",F08:"-",F09:"-",F10:"C",F11:"V",F12:"V"}};
+const EXP_TYPES=[["VISA","Visa","F08"],["GPLD","Giấy phép lao động / Miễn GPLĐ","F08"],["TRC","Thẻ tạm trú","F08"],["PASSPORT","Hộ chiếu","F08"],["HDLD","Hợp đồng lao động","F03"],["THUVIEC","Hết thử việc","F03"],["NANGLUONG","Kỳ xét nâng lương","F03"],["CC-ATLD","Chứng chỉ ATLĐ","F11"],["CC-ISO","Chứng chỉ ISO","F07"],["CC-HN","Chứng chỉ hành nghề","F07"],["BH-CAR","Bảo hiểm công trình (CAR)","F09"],["BH-YT","Bảo hiểm y tế / sức khỏe","F09"],["XE-DK","Đăng kiểm xe","F10"],["XE-BH","Bảo hiểm xe","F10"],["HD-THUE","HĐ thuê VP/kho/xe/nhà","F10"],["GPKD","Giấy phép, chứng chỉ công ty","F01"],["LICENSE","License phần mềm / bảo hành thiết bị","F12"],["KSK","Khám sức khỏe định kỳ","F11"],["ISO-DOC","Xem xét tài liệu ISO","F07"],["KHAC","Khác","F10"]];
+const REQ_TYPES=[["LEAVE","Nghỉ phép","F04"],["CAR","Đặt xe","F10"],["ROOM","Phòng họp / đăng ký khách","F10"],["STATIONERY","Văn phòng phẩm / vật tư","F10"],["IT","Hỗ trợ IT / thiết bị","F12"],["TRANSLATE","Dịch thuật","F10"],["OUTDOC","Phát hành công văn đi","F06"],["UNIFORM","Đồng phục / BHLĐ","F11"],["HRDOC","Văn bản nhân sự (HĐ, QĐ, xác nhận)","F03"],["FOREIGN","Hồ sơ người nước ngoài","F08"],["TRAINING","Đăng ký đào tạo","F07"],["INSURANCE","Yêu cầu bảo hiểm","F09"],["REPAIR","Sửa chữa, bảo trì VP","F10"]];
+const THRESHOLD={LEAVE:3,STATIONERY:5000000,CAR:1}; // nghỉ phép >3 ngày hoặc VPP >5tr cần GM
+const SOP_TEMPLATES=[
+ {id:"SOP-GPLD",name:"Cấp mới Giấy phép lao động cho NNN",func:"F08",steps:[["Xin chấp thuận nhu cầu sử dụng LĐNN (báo cáo giải trình)","H.THỦY",15],["Chuẩn bị hồ sơ: LLTP, giấy khám SK, bằng cấp hợp pháp hóa lãnh sự, ảnh, hộ chiếu","THÚY",10],["Dịch thuật, công chứng hồ sơ","LIÊN",5],["Nộp hồ sơ Sở Nội vụ / cổng dịch vụ công","H.THỦY",2],["Nhận kết quả, lưu bản gốc, cập nhật registry + Trung tâm hạn","THÚY",15],["Làm thẻ tạm trú theo GPLĐ","H.THỦY",10],["Báo cáo cho Minh và dự án; cập nhật List of Foreigners","NHUNG",2]]},
+ {id:"SOP-DCNB",name:"Chuyển hình thức DCNB sang HĐLĐ (QĐ 526/2026, NĐ 219/2025)",func:"F08",steps:[["Rà soát danh sách NNN đang DCNB, xác định lộ trình chuyển đổi","H.THỦY",5],["Xin chỉ tiêu LĐNN theo vị trí HĐLĐ","H.THỦY",15],["Chuẩn bị LLTP mới, giấy khám SK, xác nhận kinh nghiệm","THÚY",10],["Soạn HĐLĐ song ngữ từ Foreigner Registry","H.THỦY",2],["Nộp hồ sơ cấp GPLĐ theo hình thức HĐLĐ","H.THỦY",2],["Cập nhật TRC, BHXH/BHYT NNN, lương - thông báo kế toán","NGUYỆT",10],["Cập nhật registry, Trung tâm hạn, báo cáo GM","NHUNG",2]]},
+ {id:"SOP-ONB",name:"Hội nhập nhân viên mới (Onboarding)",func:"F03",steps:[["Soạn HĐ thử việc từ HR master, thu hồ sơ, consent BVDLCN","LIÊM",2],["Tạo tài khoản M365, cấp thiết bị, ký IT Commitment","LONG",1],["Bàn giao chỗ ngồi, thẻ nhân viên, đồng phục","SÂM",2],["Báo tăng BHXH (nếu HĐ chính thức)","NGUYỆT",5],["Đào tạo hội nhập, nội quy, ISO, ATLĐ","H.THỦY",7],["Thêm vào allocation list / Project master","NHUNG",1],["Đặt lịch đánh giá hết thử việc trong Trung tâm hạn","LIÊM",1]]},
+ {id:"SOP-OFF",name:"Chấm dứt HĐLĐ (Offboarding)",func:"F03",steps:[["Tiếp nhận thông tin, trao đổi người lao động, báo cáo GM","LIÊM",3],["Soạn quyết định chấm dứt, thanh lý HĐ","LIÊM",3],["Bàn giao công việc, tài sản; thu hồi thiết bị, khóa tài khoản","LONG",2],["Báo giảm BHXH, chốt sổ, trả sổ","NGUYỆT",10],["Thanh toán lương, phép, trợ cấp - chuyển kế toán","HOA",5],["Cập nhật master, allocation, lưu hồ sơ theo quy định","NHUNG",2]]},
+ {id:"SOP-PROB",name:"Đánh giá hết thử việc",func:"F03",steps:[["Gửi form đánh giá thử việc cho quản lý trực tiếp (T-10)","LIÊM",1],["Thu nhận kết quả, trình GM","LIÊM",5],["Soạn HĐLĐ chính thức hoặc thông báo không đạt","LIÊM",2],["Ký, lưu, cập nhật master, báo tăng BHXH","NGUYỆT",3]]},
+ {id:"SOP-SAL",name:"Đợt điều chỉnh lương hàng năm (Circulate Salary)",func:"F03",steps:[["Lập bảng đề xuất lương theo phòng từ HR master","LIÊM",10],["GM/BGĐ phê duyệt","TUẤN",7],["Sinh hàng loạt quyết định + phụ lục HĐ","LIÊM",2],["Ký số theo luồng, phát hành","NGUYỆT",5],["Cập nhật master, allocation, BHXH, chuyển kế toán","HOA",5]]},
+ {id:"SOP-KSK",name:"Khám sức khỏe định kỳ toàn công ty",func:"F11",steps:[["Chọn nhà cung cấp, ký hợp đồng","MINH",15],["Lập danh sách CBNV từ HR master, chia ca","SÂM",5],["Thông báo, thu đăng ký qua Forms","SÂM",7],["Tổ chức khám, điểm danh","A.DIÊN",3],["Nhận kết quả, lưu HR-CONFIDENTIAL, nhắc tái khám","A.DIÊN",15],["Đặt lịch KSK năm sau vào Trung tâm hạn","SÂM",1]]},
+ {id:"SOP-EVT",name:"Tổ chức sự kiện (khởi công, bàn giao, YEP, Sportsday)",func:"F10",steps:[["Lập kế hoạch, ngân sách, trình duyệt","MINH",10],["Danh sách khách mời, name plate, thư mời song ngữ","LIÊN",7],["Đặt địa điểm, xe, hậu cần, quà","NHUNG",10],["Truyền thông: thông báo nội bộ, VINATA News, ảnh","NHUNG",3],["Tổ chức, điểm danh","MINH",1],["Quyết toán chi phí, lưu ảnh vào kho media, báo cáo","HOA",7]]},
+ {id:"SOP-ISO",name:"Đánh giá chất lượng nội bộ ISO 9001",func:"F07",steps:[["Lập chương trình đánh giá năm, phân nhóm đánh giá viên","H.THỦY",10],["Thông báo lịch, chuẩn bị checklist theo phòng/dự án","SÂM",7],["Thực hiện đánh giá, ghi chép, lập phiếu NCR (FC-I-0401)","H.THỦY",5],["Theo dõi hành động khắc phục NCR","NGUYỆT",30],["Báo cáo tổng hợp QMR, xem xét lãnh đạo","TUẤN",10],["Chuẩn bị đánh giá chứng nhận (BV)","H.THỦY",15]]},
+ {id:"SOP-CAR",name:"Bảo hiểm công trình (CAR) cho dự án mới",func:"F09",steps:[["Nhận thông tin dự án, giá trị, thời hạn từ phòng XD","H.THỦY",2],["Lập Declaration Form, gửi môi giới/TMIV","H.THỦY",3],["So sánh chào phí, trình GM","MINH",5],["Ký hợp đồng, nhận đơn bảo hiểm","H.THỦY",7],["Thông báo khách hàng theo NĐ 220 (nếu cần)","H.THỦY",3],["Ghi sổ giao nhận hóa đơn, chuyển kế toán; cập nhật Trung tâm hạn","NGUYỆT",2]]},
+ {id:"SOP-REC",name:"Tuyển dụng một vị trí",func:"F02",steps:[["Nhận yêu cầu tuyển dụng, JD, trình duyệt","H.THỦY",3],["Đăng tin, làm việc với dịch vụ môi giới","H.THỦY",5],["Thu hồ sơ, consent BVDLCN, lập danh sách ứng viên","LIÊM",14],["Sàng lọc hồ sơ theo tiêu chí","SÂM",3],["Tổ chức phỏng vấn, tổng hợp kết quả","SÂM",7],["Thư mời nhận việc, HĐ thử việc","LIÊM",3],["Hoàn trả/hủy hồ sơ không trúng tuyển theo quy định BVDLCN","NGUYỆT",7]]},
+ {id:"SOP-DOCIN",name:"Xử lý công văn đến",func:"F06",steps:[["Tiếp nhận, scan, cấp số, vào sổ","NGUYỆT",0],["Trình GM phân công xử lý","TUẤN",1],["Chuyển phòng/bộ phận liên quan qua Teams","NGUYỆT",0],["Theo dõi xử lý, nhắc sau 3 ngày","HOA",3],["Lưu bản gốc, đóng hồ sơ","NGUYỆT",1]]}
+];
+const DOC_TEMPLATES=[
+ {id:"TPL-HDLD",name:"Hợp đồng lao động (rút gọn)",func:"F03",src:"staff",body:`CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n\nHỢP ĐỒNG LAO ĐỘNG\nSố: {{SoVanBan}}\n\nBÊN A (Người sử dụng lao động): CÔNG TY TNHH QUỐC TẾ VINATA\nĐại diện: {{DaiDien}} - Chức vụ: {{ChucVuDaiDien}}\n\nBÊN B (Người lao động): {{HoTen}}\nNgày sinh: {{NgaySinh}} - CCCD: {{CCCD}}\nĐịa chỉ: {{DiaChi}}\n\nĐiều 1. Công việc, địa điểm: Chức danh {{ChucDanh}}, làm việc tại {{DonVi}}.\nĐiều 2. Thời hạn hợp đồng: {{LoaiHD}}, từ ngày {{NgayHieuLuc}}{{DenNgay}}.\nĐiều 3. Tiền lương: {{Luong}} đồng/tháng; phụ cấp theo quy chế Công ty.\nĐiều 4. Thời giờ làm việc, nghỉ ngơi, BHXH, BHYT, BHTN: theo Bộ luật Lao động và Nội quy Công ty.\nĐiều 5. Hợp đồng lập thành 02 bản, mỗi bên giữ 01 bản.\n\nHà Nội, ngày {{NgayKy}}\nBÊN B                                         BÊN A`},
+ {id:"TPL-QD",name:"Quyết định nhân sự (bổ nhiệm / nâng lương / điều chuyển)",func:"F03",src:"staff",body:`CÔNG TY TNHH QUỐC TẾ VINATA\nSố: {{SoVanBan}}\n\nQUYẾT ĐỊNH\nV/v {{NoiDung}}\n\nGIÁM ĐỐC CÔNG TY TNHH QUỐC TẾ VINATA\n- Căn cứ Điều lệ Công ty;\n- Căn cứ Nội quy lao động và Quy chế lương, thưởng;\n- Xét đề nghị của Trưởng phòng Hành chính - Nhân sự.\n\nQUYẾT ĐỊNH:\nĐiều 1. {{NoiDung}} đối với Ông/Bà {{HoTen}}, mã NV {{MaNV}}, hiện là {{ChucDanh}} - {{DonVi}}, kể từ ngày {{NgayHieuLuc}}.\nĐiều 2. Mức lương/phụ cấp (nếu có): {{Luong}}.\nĐiều 3. Các phòng ban liên quan và Ông/Bà {{HoTen}} chịu trách nhiệm thi hành Quyết định này.\n\nHà Nội, ngày {{NgayKy}}\nGIÁM ĐỐC`},
+ {id:"TPL-CV",name:"Công văn đi (mẫu chuẩn)",func:"F06",src:"none",body:`CÔNG TY TNHH QUỐC TẾ VINATA\nSố: {{SoVanBan}}\nV/v {{TrichYeu}}\n\nKính gửi: {{NoiNhan}}\n\n{{NoiDung}}\n\nCông ty TNHH Quốc tế VINATA trân trọng cảm ơn sự hợp tác của Quý cơ quan.\n\nNơi nhận:\n- Như trên;\n- Lưu VT, HCNS.\n\nHà Nội, ngày {{NgayKy}}\nGIÁM ĐỐC`},
+ {id:"TPL-GGT",name:"Giấy giới thiệu",func:"F06",src:"staff",body:`CÔNG TY TNHH QUỐC TẾ VINATA\nSố: {{SoVanBan}}\n\nGIẤY GIỚI THIỆU\n\nKính gửi: {{NoiNhan}}\n\nCông ty TNHH Quốc tế VINATA trân trọng giới thiệu Ông/Bà {{HoTen}}, chức danh {{ChucDanh}}, CCCD số {{CCCD}}, đến Quý cơ quan để {{NoiDung}}.\nĐề nghị Quý cơ quan tạo điều kiện giúp đỡ.\nGiấy giới thiệu có giá trị đến ngày {{DenNgay}}.\n\nHà Nội, ngày {{NgayKy}}\nGIÁM ĐỐC`},
+ {id:"TPL-INV",name:"Thư mời / bảo lãnh người nước ngoài và thân nhân",func:"F08",src:"foreigner",body:`VINATA INTERNATIONAL CO., LTD.\nNo.: {{SoVanBan}}\n\nTHƯ MỜI / LETTER OF INVITATION\n\nKính gửi: {{NoiNhan}}\n\nCông ty TNHH Quốc tế VINATA kính mời/bảo lãnh Ông/Bà {{HoTen}}, quốc tịch {{QuocTich}}, hộ chiếu số {{SoHoChieu}} (hết hạn {{HanHoChieu}}), chức danh {{ChucDanh}} tại dự án/đơn vị {{DuAn}}, nhập cảnh/cư trú tại Việt Nam với mục đích {{NoiDung}}.\nĐịa chỉ cư trú tại Việt Nam: {{DiaChiVN}}.\nThời gian: từ {{NgayHieuLuc}} đến {{DenNgay}}.\nCông ty cam kết tuân thủ các quy định về xuất nhập cảnh và cư trú của người nước ngoài tại Việt Nam.\n\nHà Nội, ngày {{NgayKy}}\nGIÁM ĐỐC`},
+ {id:"TPL-LLTP",name:"Tờ khai yêu cầu cấp Phiếu lý lịch tư pháp (NNN) - khung dữ liệu",func:"F08",src:"foreigner",body:`TỜ KHAI YÊU CẦU CẤP PHIẾU LÝ LỊCH TƯ PHÁP (Mẫu số 02.2026.LLTP - khung dữ liệu điền sẵn)\n\n1. Họ và tên: {{HoTen}}        2. Giới tính: {{GioiTinh}}\n3. Ngày sinh: {{NgaySinh}}      4. Quốc tịch: {{QuocTich}}\n5. Hộ chiếu số: {{SoHoChieu}} cấp ngày {{NgayCapHoChieu}}\n6. Nơi cư trú tại Việt Nam: {{DiaChiVN}}\n7. Cơ quan/đơn vị làm việc: Công ty TNHH Quốc tế VINATA - {{DuAn}} - Chức danh {{ChucDanh}}\n8. Mục đích yêu cầu: Hoàn thiện hồ sơ cấp Giấy phép lao động\n9. Ủy quyền cho: {{NguoiUyQuyen}}\n\nNgày khai: {{NgayKy}}`},
+ {id:"TPL-ITC",name:"Biên bản bàn giao thiết bị / IT Commitment",func:"F12",src:"staff",body:`CÔNG TY TNHH QUỐC TẾ VINATA - PHÒNG HCNS (IT)\nSố: {{SoVanBan}}\n\nBIÊN BẢN BÀN GIAO THIẾT BỊ & CAM KẾT SỬ DỤNG CNTT\n\nBên giao: {{DaiDien}} - IT\nBên nhận: {{HoTen}} - {{ChucDanh}} - {{DonVi}}\n\nThiết bị: {{NoiDung}}\nNgày bàn giao: {{NgayHieuLuc}}\n\nNgười nhận cam kết: sử dụng thiết bị đúng mục đích công việc; không cài phần mềm không bản quyền; bảo mật tài khoản, dữ liệu Công ty theo Quy định bảo mật thông tin và Luật Bảo vệ dữ liệu cá nhân; hoàn trả khi nghỉ việc hoặc theo yêu cầu.\n\nHà Nội, ngày {{NgayKy}}\nBÊN NHẬN                                   BÊN GIAO`},
+ {id:"TPL-TB",name:"Thông báo nội bộ song ngữ (Việt - Nhật)",func:"F01",src:"none",body:`CÔNG TY TNHH QUỐC TẾ VINATA / VINATA国際有限会社\nSố / No.: {{SoVanBan}}\n\nTHÔNG BÁO / お知らせ\nV/v: {{TrichYeu}}\n\nKính gửi toàn thể CBNV / 社員各位\n\n{{NoiDung}}\n\n(日本語)\n{{NoiDungJP}}\n\nHà Nội, ngày {{NgayKy}}\nBAN GIÁM ĐỐC / 取締役会`}
+];
+const SEED={"foreigners":[],"expiries":[],"staff":[],"certs":[],"cars":[],"insurance":[],"projects":[]};
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function today(){return new Date().toISOString().slice(0,10);}
+function fmt(d){if(!d)return"";const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`;}
+function daysTo(d){return Math.round((new Date(d)-new Date(today()))/86400000);}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+/* ====================== TRẠNG THÁI ====================== */
+const KEY="vinata_hcns_hub_v1_2";
+let S=null, ME=null, PAGE="dash";
+function cp(x){return JSON.parse(JSON.stringify(x||[]));}
+function blank(){return {matrix:JSON.parse(JSON.stringify(MATRIX_DEFAULT)),expiries:SEED.expiries.map(e=>({id:uid(),...e})),docs:[],handovers:[],requests:[],sops:[],master:{staff:cp(SEED.staff),foreigners:cp(SEED.foreigners),cars:cp(SEED.cars),assets:[],certs:cp(SEED.certs),insurance:cp(SEED.insurance),projects:cp(SEED.projects)},log:[],seq:{docIn:0,docOut:0,req:0,vb:0},thresholds:{LEAVE:3,STATIONERY:5000000},lastBackup:null,progress:[]};}
+function load(){try{const raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):blank();}catch(e){S=blank();} if(!S.master)S.master={staff:[],foreigners:[],cars:[],assets:[]}; for(const k of ["certs","insurance","projects"]) if(!S.master[k]) S.master[k]=cp(SEED[k]); if(!S.progress)S.progress=[];}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast("Không lưu được vào trình duyệt: "+e.message);}scheduleSync();}
+function log(action,detail){S.log.unshift({t:new Date().toISOString(),u:ME,a:action,d:detail});if(S.log.length>3000)S.log.length=3000;save();}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2600);}
+function perm(f,u=ME){return (S.matrix[u]||{})[f]||"-";}
+function can(f,level){const p=perm(f);const rank={"-":0,V:1,C:2,E:3,A:4};return rank[p]>=rank[level];}
+function isGM(){return ME==="TUẤN";}
+function isMgr(){return Object.values(S.matrix[ME]||{}).includes("A")||isGM();}
+function role(u){return (USERS.find(x=>x[0]===u)||[])[1]||"";}
+
+
+/* ====================== MICROSOFT 365 (Entra ID) ====================== */
+const HUBCFG={tenantId:"__TENANT_ID__",clientId:"__CLIENT_ID__",siteHost:"vinatacomvn.sharepoint.com",sitePath:"/sites/ADM-HR",backupFolder:"HCNS-BACKUP",stateFile:"VINATA-HCNS-HUB-state.json",allowLocalLogin:false,sharedState:true,publicBuild:true};
+const EMAIL_MAP={"TUẤN":"vuminhtuan@vinata.com.vn","A.DIÊN":"thaidoandien@vinata.com.vn","H.THỦY":"nguyenhuongthuy@vinata.com.vn","MINH":"trinhhoangminh@vinata.com.vn","ĐIỂN":"nguyenduydien@vinata.com.vn","LIÊM":"hoanghuongliem@vinata.com.vn","NGUYỆT":"nguyenbichnguyet@vinata.com.vn","HOA":"buihoa@vinata.com.vn","LIÊN":"lephuonglien@vinata.com.vn","LONG":"caothanglong@vinata.com.vn","THẮNG":"tranvanthang@vinata.com.vn","SÂM":"phamsam@vinata.com.vn","NHUNG":"hongnhung@vinata.com.vn","THÚY":"nguyenthanhthuy@vinata.com.vn","NỤ":"","THẮM":""};
+const SCOPES=["User.Read","GroupMember.Read.All","Sites.ReadWrite.All"];
+let msalApp=null,ACCOUNT=null,SSO=false,syncTimer=null;
+function cfgOK(){return HUBCFG.clientId&&!HUBCFG.clientId.startsWith("__");}
+async function getToken(){if(!msalApp||!ACCOUNT)return null;try{const r=await msalApp.acquireTokenSilent({scopes:SCOPES,account:ACCOUNT});return r.accessToken;}catch(e){try{const r=await msalApp.acquireTokenPopup({scopes:SCOPES,account:ACCOUNT});return r.accessToken;}catch(e2){return null;}}}
+async function graph(path,opt={}){const t=await getToken();if(!t)throw new Error("Chưa có token");const r=await fetch("https://graph.microsoft.com/v1.0"+path,{...opt,headers:{Authorization:"Bearer "+t,...(opt.headers||{})}});if(r.status===404)return null;if(!r.ok)throw new Error("Graph "+r.status+" "+(await r.text()).slice(0,200));const ct=r.headers.get("content-type")||"";return ct.includes("json")?r.json():r.text();}
+async function m365Login(){
+ const msg=document.getElementById("ssoMsg");msg.textContent="";
+ if(!window.msal){msg.textContent="Không tải được thư viện đăng nhập Microsoft (cần internet).";return;}
+ if(!cfgOK()){msg.textContent="HUB chưa được đăng ký với Microsoft 365. IT chạy Register-HCNS-HubApp.ps1 để cấu hình.";return;}
+ try{
+  if(!msalApp){msalApp=new msal.PublicClientApplication({auth:{clientId:HUBCFG.clientId,authority:"https://login.microsoftonline.com/"+HUBCFG.tenantId,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"sessionStorage"}});await msalApp.initialize();}
+  let acc=msalApp.getAllAccounts()[0];
+  if(!acc){const res=await msalApp.loginPopup({scopes:SCOPES,prompt:"select_account"});acc=res.account;}
+  ACCOUNT=acc;SSO=true;const upn=(acc.username||"").toLowerCase();
+  // 1. Nhóm bảo mật -> quyền
+  let groups=[];try{const g=await graph("/me/memberOf?$select=displayName&$top=999");groups=(g&&g.value||[]).map(x=>x.displayName||"").filter(n=>n.startsWith("SG-HCNS-"));}catch(e){}
+  // 2. Đồng bộ trạng thái dùng chung từ SharePoint (CSDL chính) trước khi xác định người dùng
+  if(HUBCFG.sharedState&&HUBCFG.siteHost&&!HUBCFG.siteHost.startsWith("__")){try{await pullState();}catch(e){toast("Không đọc được dữ liệu dùng chung: "+e.message);}}
+  // 3. Tên trong ma trận (email map lấy từ CSDL dùng chung, dự phòng từ mã)
+  const EM=Object.assign({},EMAIL_MAP,S.emailMap||{});
+  let u=Object.keys(EM).find(k=>EM[k]&&EM[k].toLowerCase()===upn);
+  if(!u&&groups.length){u=(acc.name||upn.split("@")[0]).toUpperCase();if(!USERS.some(x=>x[0]===u))USERS.push([u,"Theo nhóm M365"]);}
+  if(!u){msg.textContent="Tài khoản "+upn+" chưa được phân quyền trong HCNS HUB (không có trong ma trận và không thuộc nhóm SG-HCNS-*). Liên hệ IT.";SSO=false;return;}
+  if(groups.length){const m=S.matrix[u]||{};const nm={};Object.keys(FUNCS).forEach(f=>{nm[f]=groups.includes("SG-HCNS-GM")?"A":groups.includes(`SG-HCNS-${f}-EDIT`)?(m[f]==="A"?"A":"E"):groups.includes(`SG-HCNS-${f}-VIEW`)?(m[f]==="C"?"C":"V"):"-";});S.matrix[u]=nm;save();}
+  login(u,{upn,name:acc.name,groups});
+ }catch(e){msg.textContent="Đăng nhập thất bại: "+(e.errorMessage||e.message);SSO=false;}
+}
+function drivePath(file){return `/sites/${HUBCFG.siteHost}:${HUBCFG.sitePath}:/drive/root:/${HUBCFG.backupFolder}/${file}`;}
+async function pullState(){const remote=await graph(drivePath(HUBCFG.stateFile)+":/content");if(remote&&remote.matrix&&remote.expiries){if(!S.savedAt||(remote.savedAt||"")>S.savedAt){const keepMe=ME;S=remote;save();toast("Đã tải dữ liệu dùng chung từ SharePoint ("+new Date(remote.savedAt).toLocaleString("vi")+")");}}}
+async function pushState(dated){if(!SSO)return;S.savedAt=new Date().toISOString();S.savedBy=ME;localStorage.setItem(KEY,JSON.stringify(S));const body=JSON.stringify(S);await graph(drivePath(HUBCFG.stateFile)+":/content",{method:"PUT",headers:{"Content-Type":"application/json"},body});if(dated){await graph(drivePath(`VINATA-HCNS-HUB-backup-${S.savedAt.replace(/[:T]/g,"-").slice(0,16)}.json`)+":/content",{method:"PUT",headers:{"Content-Type":"application/json"},body});S.lastBackup=S.savedAt;}}
+function scheduleSync(){if(!SSO||!HUBCFG.sharedState)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>pushState(false).then(()=>{const el=document.getElementById("syncDot");if(el)el.textContent="☁ đã đồng bộ "+new Date().toLocaleTimeString("vi");}).catch(e=>toast("Đồng bộ SharePoint lỗi: "+e.message)),8000);}
+async function m365Logout(){if(msalApp&&ACCOUNT){try{await pushState(false);}catch(e){}await msalApp.logoutPopup({account:ACCOUNT}).catch(()=>{});}ACCOUNT=null;SSO=false;logout();}
+
+/* ====================== ĐĂNG NHẬP ====================== */
+load();
+if(HUBCFG.allowLocalLogin){document.getElementById("people").innerHTML=USERS.map(([n,r])=>`<button class="pbtn" onclick="login('${n}')"><b>${n}</b><small>${r}</small></button>`).join("");}else{document.getElementById("localBox").style.display="none";}
+function login(u,info){ME=u;document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";
+ document.getElementById("me").innerHTML=`<b>${u}</b><small>${role(u)}</small>${info?`<br><small>${esc(info.upn)}</small><br><small id="syncDot" style="color:#9ad7dc">☁ Microsoft 365${info.groups&&info.groups.length?" · "+info.groups.length+" nhóm":""}</small>`:"<br><small style='color:#f5c26b'>Chế độ ngoại tuyến</small>"}<br><a href="#" onclick="${info?"m365Logout()":"logout()"};return false" style="color:#9ad7dc;font-size:12px">Đăng xuất</a>`;
+ log("Đăng nhập",info?"M365 "+info.upn:"ngoại tuyến");renderNav();go("dash");}
+function logout(){ME=null;document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";}
+
+/* ====================== ĐIỀU HƯỚNG ====================== */
+const NAVS=[
+ ["grp","Điều hành"],["dash","📊 Bảng điều khiển",()=>true],["req","📨 Yêu cầu nội bộ",()=>true],["exp","⏰ Trung tâm hạn hiệu lực",()=>true],
+ ["grp","Nghiệp vụ"],["doc","📁 Sổ công văn",()=>can("F06","V")],["hand","🧾 Sổ giao nhận chứng từ",()=>can("F06","V")||can("F09","V")],["sop","🧭 Quy trình (SOP runner)",()=>true],["tpl","📝 Kho mẫu & sinh văn bản",()=>true],["ts","🕒 Kiểm tra chấm công",()=>can("F04","E")],
+ ["grp","Dữ liệu chủ"],["staff","👥 Nhân sự (HR master)",()=>can("F03","V")],["foreign","🌏 Người nước ngoài",()=>can("F08","V")],["cars","🚗 Xe & hợp đồng thuê",()=>can("F10","V")],["assets","💻 Thiết bị IT",()=>can("F12","V")],["certs","🎓 Chứng chỉ & Đào tạo",()=>can("F07","V")||can("F11","V")],["insurance","🛡 Bảo hiểm",()=>can("F09","V")],["projects","🏗 Dự án",()=>can("F04","V")||can("F09","V")],
+ ["grp","Quản trị"],["progress","🎯 PROGRESS 2026",()=>isMgr()],["kpi","📈 Báo cáo KPI",()=>isMgr()],["matrix","🔐 Ma trận phân quyền",()=>true],["log","🗂 Nhật ký & Sao lưu",()=>true],["help","❓ Hướng dẫn",()=>true]];
+function renderNav(){document.getElementById("nav").innerHTML=NAVS.map(n=>n[0]==="grp"?`<div class="grp">${n[1]}</div>`:(n[2]()?`<a href="#" id="nav-${n[0]}" onclick="go('${n[0]}');return false">${n[1]}</a>`:"")).join("");}
+function go(p){PAGE=p;document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("on",a.id==="nav-"+p));const f=PAGES[p];document.getElementById("main").innerHTML=f?f():"";window.scrollTo(0,0);}
+function modal(html){document.getElementById("mbox").innerHTML=html;document.getElementById("modal").classList.add("on");}
+function closeModal(){document.getElementById("modal").classList.remove("on");}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+function val(id){const el=document.getElementById(id);return el?el.value.trim():"";}
+function hdr(title,btns=""){return `<div class="top"><h2>${title}</h2><div>${btns}</div></div>`;}
+function expTag(d){const n=daysTo(d);if(n<0)return `<span class="tag t-red">Quá hạn ${-n} ngày</span>`;if(n<=30)return `<span class="tag t-amb">Còn ${n} ngày</span>`;if(n<=90)return `<span class="tag t-yel">Còn ${n} ngày</span>`;return `<span class="tag t-grn">Còn ${n} ngày</span>`;}
+function tname(list,code){return (list.find(x=>x[0]===code)||[])[1]||code;}
+function tfunc(list,code){return (list.find(x=>x[0]===code)||[])[2]||"F10";}
+function reqStatusTag(s){return {pending:'<span class="tag t-amb">Chờ duyệt</span>',approved:'<span class="tag t-grn">Đã duyệt</span>',rejected:'<span class="tag t-red">Từ chối</span>',done:'<span class="tag t-blu">Hoàn thành</span>'}[s]||s;}
+
+/* ====================== TRANG ====================== */
+const PAGES={};
+/* ---- Dashboard ---- */
+PAGES.dash=()=>{
+ const myExp=S.expiries.filter(e=>e.status==="open"&&(e.pic===ME||isGM()||perm(tfunc(EXP_TYPES,e.type))==="A"));
+ const over=myExp.filter(e=>daysTo(e.date)<0),soon=myExp.filter(e=>{const n=daysTo(e.date);return n>=0&&n<=30;}),q=myExp.filter(e=>{const n=daysTo(e.date);return n>30&&n<=90;});
+ const pend=S.requests.filter(r=>r.status==="pending"&&canApprove(r));
+ const mine=S.requests.filter(r=>r.by===ME&&r.status!=="done");
+ const mySteps=[];S.sops.forEach(s=>s.steps.forEach((st,i)=>{if(!st.done&&st.pic===ME)mySteps.push({s,st,i});}));
+ const docsOpen=S.docs.filter(d=>d.dir==="in"&&d.status!=="done");
+ return hdr(`Xin chào ${ME}`,`<span class="muted">${fmt(today())}</span>`)+
+ `<div class="cards">
+  <div class="card r"><div class="v">${over.length}</div><div class="l">Hạn đã quá (của tôi / tôi duyệt)</div></div>
+  <div class="card a"><div class="v">${soon.length}</div><div class="l">Hạn trong 30 ngày</div></div>
+  <div class="card"><div class="v">${q.length}</div><div class="l">Hạn trong 31-90 ngày</div></div>
+  <div class="card a"><div class="v">${pend.length}</div><div class="l">Yêu cầu chờ tôi duyệt</div></div>
+  <div class="card"><div class="v">${mySteps.length}</div><div class="l">Bước quy trình tôi phụ trách</div></div>
+  <div class="card"><div class="v">${mine.length}</div><div class="l">Yêu cầu tôi đã gửi (đang mở)</div></div>
+ </div>
+ ${S.lastBackup?"":'<div class="hint">Chưa có bản sao lưu nào. Vào <b>Nhật ký & Sao lưu</b> để xuất JSON và lưu 2 nơi (SharePoint HCNS-BACKUP + máy IT).</div>'}
+ <div class="panel"><h3>Việc cần làm ngay</h3>
+  ${[...over,...soon].length?`<table><tr><th>Loại</th><th>Đối tượng</th><th>Hạn</th><th>PIC</th><th>Tình trạng</th><th></th></tr>${[...over,...soon].sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<tr><td>${tname(EXP_TYPES,e.type)}</td><td>${esc(e.obj)}</td><td>${fmt(e.date)}</td><td>${e.pic}</td><td>${expTag(e.date)}</td><td><button class="btn sm sec" onclick="go('exp')">Mở</button></td></tr>`).join("")}</table>`:'<p class="muted">Không có hạn nào trong 30 ngày tới.</p>'}
+ </div>
+ ${pend.length?`<div class="panel"><h3>Yêu cầu chờ tôi duyệt</h3><table><tr><th>Số</th><th>Loại</th><th>Người gửi</th><th>Nội dung</th><th>Ngày</th><th></th></tr>${pend.map(r=>`<tr><td>${r.no}</td><td>${tname(REQ_TYPES,r.type)}</td><td>${r.by}</td><td>${esc(r.content)}</td><td>${fmt(r.date)}</td><td><button class="btn sm" onclick="approve('${r.id}',1)">Duyệt</button> <button class="btn sm dan" onclick="approve('${r.id}',0)">Từ chối</button></td></tr>`).join("")}</table></div>`:""}
+ ${mySteps.length?`<div class="panel"><h3>Bước quy trình tôi phụ trách</h3><table><tr><th>Hồ sơ</th><th>Bước</th><th>Hạn</th><th></th></tr>${mySteps.map(({s,st,i})=>`<tr><td>${esc(s.name)}<br><small class="muted">${esc(s.subject)}</small></td><td>${i+1}. ${esc(st.name)}</td><td>${st.due?fmt(st.due)+" "+expTag(st.due):""}</td><td><button class="btn sm" onclick="sopDone('${s.id}',${i})">Hoàn thành</button></td></tr>`).join("")}</table></div>`:""}
+ ${can("F06","V")&&docsOpen.length?`<div class="panel"><h3>Công văn đến chưa xử lý: ${docsOpen.length}</h3><p class="muted">${docsOpen.slice(0,5).map(d=>`${d.no} - ${esc(d.subject)}`).join(" · ")}</p></div>`:""}
+ ${(can("F03","V")||can("F10","E"))?(()=>{const m=today().slice(5,7);const b=S.master.staff.filter(x=>x.TrangThai!=="Đã nghỉ"&&x.NgaySinh&&x.NgaySinh.slice(5,7)===m).sort((a,b)=>a.NgaySinh.slice(8)>b.NgaySinh.slice(8)?1:-1);return `<div class="panel"><h3>Sinh nhật tháng ${m} (${b.length})</h3><p class="muted">${b.map(x=>`${x.NgaySinh.slice(8)}/${m} ${esc(x.HoTen)} (${x.DonVi})`).join(" · ")||"Không có"}</p></div>`;})():""}
+ <div class="panel"><h3>Quyền của tôi theo ma trận</h3>${Object.keys(FUNCS).map(f=>`<span class="chip">${f} ${FUNCS[f]} <span class="perm p${perm(f)}">${perm(f)}</span></span>`).join("")}<p class="muted" style="margin:8px 0 0">A = Phê duyệt, E = Sửa/xóa, C = Thêm (không xóa), V = Xem, - = Không có quyền</p></div>`;
+};
+
+/* ---- Trung tâm hạn hiệu lực ---- */
+let expFilter={type:"",pic:"",q:"",review:false};
+PAGES.exp=()=>{
+ const rows=S.expiries.filter(e=>perm(tfunc(EXP_TYPES,e.type))!=="-").filter(e=>(expFilter.review?e.status==="review":e.status!=="review")).filter(e=>(!expFilter.type||e.type===expFilter.type)&&(!expFilter.pic||e.pic===expFilter.pic)&&(!expFilter.q||(e.obj+e.note).toLowerCase().includes(expFilter.q.toLowerCase()))).sort((a,b)=>(a.status==="open"?0:1)-(b.status==="open"?0:1)||a.date.localeCompare(b.date));
+ const canAdd=EXP_TYPES.some(t=>can(t[2],"C"));
+ return hdr("Trung tâm hạn hiệu lực",(canAdd?`<button class="btn" onclick="expForm()">+ Thêm hạn</button> `:"")+`<button class="btn sec" onclick="exportCSV('expiries')">Xuất CSV</button>`)+
+ `<div class="hint">Một nơi cho mọi loại hạn: visa/GPLĐ/TRC/hộ chiếu, HĐLĐ, thử việc, chứng chỉ, bảo hiểm, đăng kiểm, HĐ thuê, giấy phép, license. Màu: đỏ quá hạn, cam ≤30 ngày, vàng ≤90 ngày. Các hạn đã qua trước 2026 lấy từ danh sách cũ được xếp vào "Cần đối chiếu" - mở từng dòng, xác nhận đã gia hạn hoặc cập nhật ngày mới. Nhắc đa tầng T-90/60/30/7 được tự động hóa bằng Power Automate F-01 ở giai đoạn 2.</div>
+ <div class="row"><select onchange="expFilter.type=this.value;go('exp')"><option value="">Tất cả loại</option>${EXP_TYPES.map(t=>`<option ${expFilter.type===t[0]?"selected":""} value="${t[0]}">${t[1]}</option>`).join("")}</select>
+ <select onchange="expFilter.pic=this.value;go('exp')"><option value="">Tất cả PIC</option>${USERS.map(u=>`<option ${expFilter.pic===u[0]?"selected":""}>${u[0]}</option>`).join("")}</select>
+ <input placeholder="Tìm đối tượng..." value="${esc(expFilter.q)}" onchange="expFilter.q=this.value;go('exp')"><label><input type="checkbox" ${expFilter.review?"checked":""} onchange="expFilter.review=this.checked;go('exp')"> Cần đối chiếu (${S.expiries.filter(e=>e.status==="review").length})</label><span class="muted">Đang theo dõi: ${S.expiries.filter(e=>e.status==="open").length}</span></div>
+ <div class="panel"><table><tr><th>Loại</th><th>Đối tượng</th><th>Ngày hết hạn</th><th>Tình trạng</th><th>PIC</th><th>Ghi chú</th><th></th></tr>
+ ${rows.map(e=>{const f=tfunc(EXP_TYPES,e.type);const ed=can(f,"E")||e.pic===ME;return `<tr style="${e.status!=="open"?"opacity:.5":""}"><td>${tname(EXP_TYPES,e.type)}<br><small class="muted">${f}</small></td><td>${esc(e.obj)}</td><td>${fmt(e.date)}</td><td>${e.status==="open"?expTag(e.date):e.status==="review"?'<span class="tag t-gry">Cần đối chiếu</span>':'<span class="tag t-gry">Đã xử lý</span>'}</td><td>${e.pic}</td><td>${esc(e.note||"")}</td><td style="white-space:nowrap">${ed?`<button class="btn sm sec" onclick="expForm('${e.id}')">Sửa</button> ${e.status==="open"?`<button class="btn sm" onclick="expClose('${e.id}')">Đã xử lý</button>`:e.status==="review"?`<button class="btn sm" onclick="expReopen('${e.id}')">Còn hiệu lực - theo dõi</button> <button class="btn sm sec" onclick="expClose('${e.id}')">Đã gia hạn/bỏ</button>`:""} ${can(f,"E")?`<button class="btn sm dan" onclick="expDel('${e.id}')">Xóa</button>`:""}`:""}</td></tr>`;}).join("")||'<tr><td colspan="7" class="muted">Chưa có dữ liệu.</td></tr>'}</table></div>`;
+};
+function expForm(id){const e=id?S.expiries.find(x=>x.id===id):{type:"GPLD",obj:"",date:addDays(90),pic:ME,note:""};
+ modal(`<h3>${id?"Sửa":"Thêm"} hạn hiệu lực</h3><div class="grid2">
+ <div><label>Loại</label><select id="f_type">${EXP_TYPES.filter(t=>can(t[2],"C")).map(t=>`<option value="${t[0]}" ${e.type===t[0]?"selected":""}>${t[1]} (${t[2]})</option>`).join("")}</select></div>
+ <div><label>Ngày hết hạn</label><input type="date" id="f_date" value="${e.date}"></div>
+ <div><label>Đối tượng (người / xe / dự án / chứng chỉ)</label><input id="f_obj" value="${esc(e.obj)}"></div>
+ <div><label>PIC theo dõi</label><select id="f_pic">${USERS.map(u=>`<option ${e.pic===u[0]?"selected":""}>${u[0]}</option>`).join("")}</select></div></div>
+ <div class="g1"><label>Ghi chú (số giấy tờ, nơi cấp, bước cần làm)</label><input id="f_note" value="${esc(e.note||"")}"></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="expSave('${id||""}')">Lưu</button></div>`);}
+function expSave(id){const o={type:val("f_type"),date:val("f_date"),obj:val("f_obj"),pic:val("f_pic"),note:val("f_note")};if(!o.obj||!o.date)return toast("Thiếu đối tượng hoặc ngày");
+ if(id){Object.assign(S.expiries.find(x=>x.id===id),o);log("Sửa hạn",o.obj);}else{S.expiries.push({id:uid(),...o,status:"open",created:today()});log("Thêm hạn",o.obj);}save();closeModal();go("exp");toast("Đã lưu");}
+function expReopen(id){const e=S.expiries.find(x=>x.id===id);const d=prompt("Ngày hết hạn mới (YYYY-MM-DD), để trống giữ nguyên:")||"";if(/^\d{4}-\d{2}-\d{2}$/.test(d))e.date=d;e.status="open";log("Mở theo dõi hạn",e.obj);save();go("exp");}
+function expClose(id){const e=S.expiries.find(x=>x.id===id);e.status="done";log("Đã xử lý hạn",e.obj);save();go("exp");}
+function expDel(id){if(!confirm("Xóa dòng này?"))return;const e=S.expiries.find(x=>x.id===id);S.expiries=S.expiries.filter(x=>x.id!==id);log("Xóa hạn",e.obj);save();go("exp");}
+
+/* ---- Yêu cầu nội bộ ---- */
+function canApprove(r){const f=tfunc(REQ_TYPES,r.type);if(isGM())return true;if(r.needGM)return false;return perm(f)==="A";}
+PAGES.req=()=>{
+ const list=S.requests.slice().reverse().filter(r=>r.by===ME||canApprove(r)||perm(tfunc(REQ_TYPES,r.type))!=="-"&&perm(tfunc(REQ_TYPES,r.type))!=="V"||isMgr());
+ return hdr("Yêu cầu nội bộ (1 cửa)",`<button class="btn" onclick="reqForm()">+ Gửi yêu cầu</button>`)+
+ `<div class="hint">Mọi yêu cầu được định tuyến theo lĩnh vực và duyệt theo ngưỡng: nghỉ phép > ${S.thresholds.LEAVE} ngày, chi phí > ${S.thresholds.STATIONERY.toLocaleString("vi")} đ, văn bản nhân sự và hồ sơ NNN cần GM; còn lại Manager có quyền A của lĩnh vực duyệt. Giai đoạn 2 chuyển lên Teams Approvals (Flow F-02).</div>
+ <div class="panel"><table><tr><th>Số</th><th>Loại</th><th>Người gửi</th><th>Nội dung</th><th>Ngày cần</th><th>Giá trị</th><th>Trạng thái</th><th>Duyệt bởi</th><th></th></tr>
+ ${list.map(r=>`<tr><td>${r.no}</td><td>${tname(REQ_TYPES,r.type)}${r.needGM?' <span class="tag t-blu">GM</span>':""}</td><td>${r.by}</td><td>${esc(r.content)}</td><td>${fmt(r.need)}</td><td>${r.amount?Number(r.amount).toLocaleString("vi"):""}</td><td>${reqStatusTag(r.status)}</td><td>${r.approver||""}<br><small class="muted">${esc(r.comment||"")}</small></td><td style="white-space:nowrap">${r.status==="pending"&&canApprove(r)?`<button class="btn sm" onclick="approve('${r.id}',1)">Duyệt</button> <button class="btn sm dan" onclick="approve('${r.id}',0)">Từ chối</button>`:""}${r.status==="approved"&&(r.by===ME||can(tfunc(REQ_TYPES,r.type),"E"))?`<button class="btn sm sec" onclick="reqDone('${r.id}')">Hoàn thành</button>`:""}</td></tr>`).join("")||'<tr><td colspan="9" class="muted">Chưa có yêu cầu.</td></tr>'}</table></div>`;
+};
+function reqForm(){modal(`<h3>Gửi yêu cầu</h3><div class="grid2">
+ <div><label>Loại yêu cầu</label><select id="r_type">${REQ_TYPES.map(t=>`<option value="${t[0]}">${t[1]} (${t[2]})</option>`).join("")}</select></div>
+ <div><label>Ngày cần / bắt đầu</label><input type="date" id="r_need" value="${addDays(3)}"></div>
+ <div><label>Số ngày (nghỉ phép) / số lượng</label><input type="number" id="r_days" value="1" min="0"></div>
+ <div><label>Giá trị ước tính (đ) nếu có</label><input type="number" id="r_amount" value="0" min="0"></div></div>
+ <div class="g1"><label>Nội dung chi tiết</label><textarea id="r_content" placeholder="Ví dụ: Xin nghỉ phép năm ngày 25-26/10 (2 ngày), bàn giao cho ..."></textarea></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="reqSave()">Gửi</button></div>`);}
+function reqSave(){const type=val("r_type"),days=Number(val("r_days")||0),amount=Number(val("r_amount")||0),content=val("r_content");if(!content)return toast("Nhập nội dung");
+ const needGM=(type==="LEAVE"&&days>S.thresholds.LEAVE)||amount>S.thresholds.STATIONERY||["HRDOC","FOREIGN","OUTDOC"].includes(type);
+ S.seq.req++;const r={id:uid(),no:`YC-${new Date().getFullYear()}-${String(S.seq.req).padStart(3,"0")}`,type,by:ME,date:today(),need:val("r_need"),days,amount,content,status:"pending",needGM};S.requests.push(r);log("Gửi yêu cầu",r.no+" "+content);save();closeModal();go("req");toast("Đã gửi "+r.no+(needGM?" (cần GM duyệt)":""));}
+function approve(id,ok){const r=S.requests.find(x=>x.id===id);if(!canApprove(r))return toast("Bạn không có quyền duyệt yêu cầu này");const c=prompt(ok?"Ghi chú khi duyệt (tùy chọn):":"Lý do từ chối:")??"";r.status=ok?"approved":"rejected";r.approver=ME;r.comment=c;r.approvedAt=today();log(ok?"Duyệt":"Từ chối",r.no);save();go(PAGE);toast(ok?"Đã duyệt":"Đã từ chối");}
+function reqDone(id){const r=S.requests.find(x=>x.id===id);r.status="done";log("Hoàn thành yêu cầu",r.no);save();go("req");}
+
+/* ---- Sổ công văn ---- */
+PAGES.doc=()=>{
+ const rows=S.docs.slice().reverse();
+ return hdr("Sổ công văn điện tử",(can("F06","C")?`<button class="btn" onclick="docForm('in')">+ Công văn đến</button> <button class="btn" onclick="docForm('out')">+ Công văn đi</button> `:"")+`<button class="btn sec" onclick="exportCSV('docs')">Xuất CSV</button>`)+
+ `<div class="hint">Thay sổ FC-I-0106 / FC-I-0107 bằng sổ điện tử: số tự cấp (VNT-ĐẾN-YYYY-NNN / VNT-ĐI-YYYY-NNN), phân phối tới phòng liên quan, theo dõi trạng thái xử lý. File gốc lưu SharePoint F06-VANTHU; ghi đường dẫn vào cột File.</div>
+ <div class="panel"><table><tr><th>Số</th><th>Chiều</th><th>Ngày</th><th>Số/ký hiệu gốc</th><th>Nơi gửi/nhận</th><th>Trích yếu</th><th>Phân phối / xử lý</th><th>Hạn</th><th>File</th><th>Trạng thái</th><th></th></tr>
+ ${rows.map(d=>`<tr><td>${d.no}</td><td>${d.dir==="in"?'<span class="tag t-blu">Đến</span>':'<span class="tag t-grn">Đi</span>'}</td><td>${fmt(d.date)}</td><td>${esc(d.ref)}</td><td>${esc(d.party)}</td><td>${esc(d.subject)}</td><td>${esc(d.assign)}</td><td>${d.due?fmt(d.due)+" "+(d.status!=="done"?expTag(d.due):""):""}</td><td><small>${esc(d.file)}</small></td><td>${d.status==="done"?'<span class="tag t-gry">Đã xử lý</span>':'<span class="tag t-amb">Đang xử lý</span>'}</td><td style="white-space:nowrap">${can("F06","E")?`<button class="btn sm sec" onclick="docForm('${d.dir}','${d.id}')">Sửa</button> `:""}${d.status!=="done"&&can("F06","C")?`<button class="btn sm" onclick="docDone('${d.id}')">Xong</button>`:""}</td></tr>`).join("")||'<tr><td colspan="11" class="muted">Chưa có công văn.</td></tr>'}</table></div>`;
+};
+function docForm(dir,id){const d=id?S.docs.find(x=>x.id===id):{dir,date:today(),ref:"",party:"",subject:"",assign:"",due:addDays(7),file:""};
+ modal(`<h3>${id?"Sửa":"Thêm"} công văn ${dir==="in"?"đến":"đi"}</h3><div class="grid2">
+ <div><label>Ngày ${dir==="in"?"nhận":"phát hành"}</label><input type="date" id="d_date" value="${d.date}"></div><div><label>Số/ký hiệu ${dir==="in"?"của nơi gửi":"(để trống sẽ tự cấp)"}</label><input id="d_ref" value="${esc(d.ref)}"></div>
+ <div><label>${dir==="in"?"Nơi gửi":"Nơi nhận"}</label><input id="d_party" value="${esc(d.party)}"></div><div><label>Hạn xử lý / phản hồi</label><input type="date" id="d_due" value="${d.due||""}"></div>
+ <div><label>Trích yếu</label><input id="d_subject" value="${esc(d.subject)}"></div><div><label>Phân phối tới / người xử lý</label><input id="d_assign" value="${esc(d.assign)}" placeholder="Phòng XD, Kế toán, H.THỦY..."></div></div>
+ <div class="g1"><label>Đường dẫn file trên SharePoint</label><input id="d_file" value="${esc(d.file)}" placeholder="F06-VANTHU/2026/..."></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="docSave('${dir}','${id||""}')">Lưu</button></div>`);}
+function docSave(dir,id){const o={date:val("d_date"),ref:val("d_ref"),party:val("d_party"),subject:val("d_subject"),assign:val("d_assign"),due:val("d_due"),file:val("d_file")};if(!o.subject)return toast("Nhập trích yếu");
+ if(id){Object.assign(S.docs.find(x=>x.id===id),o);log("Sửa công văn",o.subject);}else{const y=new Date().getFullYear();if(dir==="in"){S.seq.docIn++;o.no=`VNT-ĐẾN-${y}-${String(S.seq.docIn).padStart(3,"0")}`;}else{S.seq.docOut++;o.no=`VNT-ĐI-${y}-${String(S.seq.docOut).padStart(3,"0")}`;if(!o.ref)o.ref=`${String(S.seq.docOut).padStart(3,"0")}/${y}/VNT-HCNS`;}S.docs.push({id:uid(),dir,status:"open",...o});log("Thêm công văn",o.no+" "+o.subject);}save();closeModal();go("doc");toast("Đã lưu");}
+function docDone(id){const d=S.docs.find(x=>x.id===id);d.status="done";log("Xử lý xong công văn",d.no);save();go("doc");}
+
+/* ---- Sổ giao nhận chứng từ ---- */
+PAGES.hand=()=>{
+ const rows=S.handovers.slice().reverse();const canAdd=can("F06","C")||can("F09","C")||can("F10","C");
+ const sum=S.handovers.filter(h=>h.date.startsWith(today().slice(0,7))).reduce((a,h)=>a+Number(h.amount||0),0);
+ return hdr("Sổ giao nhận chứng từ / hóa đơn",(canAdd?`<button class="btn" onclick="handForm()">+ Thêm dòng</button> `:"")+`<button class="btn sec" onclick="exportCSV('handovers')">Xuất CSV</button>`)+
+ `<div class="hint">Thay 'So cap nhat ban giao chung tu (tu nam 2022~).xlsx': người giao ghi dòng, kế toán/người nhận bấm 'Xác nhận' thay ký giấy. Tháng này: <b>${sum.toLocaleString("vi")} đ</b>. Giai đoạn 2 nối thẳng với Hệ thống phê duyệt thanh toán để không nhập hai lần.</div>
+ <div class="panel"><table><tr><th>#</th><th>Ngày giao</th><th>Người/đơn vị nhận</th><th>Chứng từ / nội dung</th><th>Nhà cung cấp</th><th>Số HĐ</th><th>Ngày HĐ</th><th>Số tiền</th><th>Lĩnh vực</th><th>Xác nhận</th><th></th></tr>
+ ${rows.map((h,i)=>`<tr><td>${rows.length-i}</td><td>${fmt(h.date)}</td><td>${esc(h.to)}</td><td>${esc(h.doc)}</td><td>${esc(h.vendor)}</td><td>${esc(h.inv)}</td><td>${fmt(h.invDate)}</td><td style="text-align:right">${Number(h.amount||0).toLocaleString("vi")}</td><td>${h.func}</td><td>${h.confirmed?`<span class="tag t-grn">${h.confirmedBy} ${fmt(h.confirmedAt)}</span>`:`<button class="btn sm" onclick="handConfirm('${h.id}')">Xác nhận nhận</button>`}</td><td>${can(h.func,"E")?`<button class="btn sm dan" onclick="handDel('${h.id}')">Xóa</button>`:""}</td></tr>`).join("")||'<tr><td colspan="11" class="muted">Chưa có dữ liệu.</td></tr>'}</table></div>`;
+};
+function handForm(){modal(`<h3>Thêm dòng giao nhận</h3><div class="grid2">
+ <div><label>Ngày giao</label><input type="date" id="h_date" value="${today()}"></div><div><label>Người / đơn vị nhận</label><input id="h_to" placeholder="Kế toán - Tố Lan"></div>
+ <div><label>Chứng từ / nội dung</label><input id="h_doc" placeholder="Phí bảo hiểm DA..., Thẻ tạm trú Mr..., In namecard..."></div><div><label>Nhà cung cấp</label><input id="h_vendor" placeholder="TMIV, HAKI, Phòng XNC..."></div>
+ <div><label>Số hóa đơn</label><input id="h_inv"></div><div><label>Ngày hóa đơn</label><input type="date" id="h_invDate"></div>
+ <div><label>Số tiền (đ)</label><input type="number" id="h_amount" value="0"></div><div><label>Lĩnh vực chi phí</label><select id="h_func">${["F08","F09","F10","F11","F07","F12","F03","F06"].map(f=>`<option value="${f}">${f} ${FUNCS[f]}</option>`).join("")}</select></div></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="handSave()">Lưu</button></div>`);}
+function handSave(){const o={date:val("h_date"),to:val("h_to"),doc:val("h_doc"),vendor:val("h_vendor"),inv:val("h_inv"),invDate:val("h_invDate"),amount:Number(val("h_amount")||0),func:val("h_func"),by:ME,confirmed:false};if(!o.doc)return toast("Nhập chứng từ");S.handovers.push({id:uid(),...o});log("Giao nhận",o.doc);save();closeModal();go("hand");}
+function handConfirm(id){const h=S.handovers.find(x=>x.id===id);h.confirmed=true;h.confirmedBy=ME;h.confirmedAt=today();log("Xác nhận nhận chứng từ",h.doc);save();go("hand");}
+function handDel(id){if(!confirm("Xóa?"))return;S.handovers=S.handovers.filter(x=>x.id!==id);log("Xóa giao nhận",id);save();go("hand");}
+
+/* ---- SOP runner ---- */
+PAGES.sop=()=>{
+ const inst=S.sops.filter(s=>perm(s.func)!=="-").slice().reverse();
+ return hdr("Quy trình chạy được (SOP runner)",`<button class="btn" onclick="sopNew()">+ Mở hồ sơ quy trình</button>`)+
+ `<div class="hint">Mỗi quy trình là chuỗi bước có người - hạn - bằng chứng. Hạn mỗi bước được tính tự động từ ngày mở hồ sơ. Bước của bạn sẽ hiện ở Bảng điều khiển. 12 quy trình mẫu được xây từ 'Quy trình Quản trị Nhân sự', thực tiễn thủ tục NNN và ISO của phòng.</div>
+ <div class="panel"><h3>Thư viện quy trình</h3>${SOP_TEMPLATES.map(t=>`<span class="chip">${t.id} · ${t.name} <small>(${t.func}, ${t.steps.length} bước)</small></span>`).join("")}</div>
+ ${inst.map(s=>{const done=s.steps.filter(x=>x.done).length,pct=Math.round(done/s.steps.length*100);return `<div class="panel"><div class="row" style="justify-content:space-between"><div><b>${esc(s.name)}</b> - ${esc(s.subject)} <span class="tag ${pct===100?"t-grn":"t-blu"}">${pct}%</span><br><small class="muted">Mở ${fmt(s.opened)} bởi ${s.by} · ${s.func}</small></div><div>${can(s.func,"E")?`<button class="btn sm dan" onclick="sopDel('${s.id}')">Xóa hồ sơ</button>`:""}</div></div><div class="bar"><i style="width:${pct}%"></i></div>
+  <ul class="steps" style="list-style:none;padding:0;margin:10px 0 0">${s.steps.map((st,i)=>`<li class="${st.done?"done":""}"><input type="checkbox" ${st.done?"checked":""} ${(!st.done&&(st.pic===ME||can(s.func,"E")))?"":"disabled"} onchange="sopDone('${s.id}',${i})"><div style="flex:1"><b>${i+1}. ${esc(st.name)}</b><br><small class="muted">PIC: ${st.pic} · Hạn: ${fmt(st.due)} ${st.done?"· Xong "+fmt(st.doneAt)+" bởi "+st.doneBy+(st.evidence?" · "+esc(st.evidence):""):expTag(st.due)}</small></div></li>`).join("")}</ul></div>`;}).join("")||'<p class="muted">Chưa có hồ sơ quy trình nào đang chạy.</p>'}`;
+};
+function sopNew(){const ts=SOP_TEMPLATES.filter(t=>can(t.func,"C"));if(!ts.length)return toast("Bạn không có quyền mở quy trình");
+ modal(`<h3>Mở hồ sơ quy trình</h3><div class="g1"><label>Quy trình</label><select id="s_tpl">${ts.map(t=>`<option value="${t.id}">${t.name}</option>`).join("")}</select></div><div class="g1"><label>Đối tượng (người / dự án / sự kiện)</label><input id="s_subject" placeholder="Ví dụ: Mizuguchi Hirokazu - GPLĐ 2027"></div><div class="g1"><label>Ngày bắt đầu</label><input type="date" id="s_date" value="${today()}"></div>
+ <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="sopCreate()">Mở hồ sơ</button></div>`);}
+function sopCreate(){const t=SOP_TEMPLATES.find(x=>x.id===val("s_tpl"));const subject=val("s_subject");if(!subject)return toast("Nhập đối tượng");let d=new Date(val("s_date"));const steps=t.steps.map(([name,pic,days])=>{d=new Date(d);d.setDate(d.getDate()+days);return {name,pic,due:d.toISOString().slice(0,10),done:false};});
+ S.sops.push({id:uid(),tpl:t.id,name:t.name,func:t.func,subject,opened:val("s_date"),by:ME,steps});log("Mở quy trình",t.name+" - "+subject);save();closeModal();go("sop");}
+function sopDone(id,i){const s=S.sops.find(x=>x.id===id);const st=s.steps[i];if(st.done){st.done=false;st.doneAt=null;st.doneBy=null;}else{const ev=prompt("Bằng chứng / ghi chú (tên file, số biên nhận...):")??"";st.done=true;st.doneAt=today();st.doneBy=ME;st.evidence=ev;}log("Bước quy trình",s.subject+" - "+st.name);save();go(PAGE);}
+function sopDel(id){if(!confirm("Xóa hồ sơ quy trình?"))return;S.sops=S.sops.filter(x=>x.id!==id);log("Xóa quy trình",id);save();go("sop");}
+
+/* ---- Kho mẫu & sinh văn bản ---- */
+let tplSel=null;
+PAGES.tpl=()=>{
+ const ts=DOC_TEMPLATES.filter(t=>perm(t.func)!=="-");
+ return hdr("Kho mẫu & sinh văn bản (mail-merge)")+
+ `<div class="hint">Chọn mẫu, chọn đối tượng từ dữ liệu chủ (nhân sự / người nước ngoài), điền các trường còn lại, bấm Sinh văn bản. Kết quả tải về dạng Word (.doc) mở được bằng MS Word để hoàn thiện và ký. Giai đoạn 2: mẫu .docx chuẩn của phòng với trường {{...}} và Flow F-04 ký số theo luồng.</div>
+ <div class="panel"><div class="row"><select id="t_sel" onchange="tplSel=this.value;go('tpl')"><option value="">-- Chọn mẫu --</option>${ts.map(t=>`<option value="${t.id}" ${tplSel===t.id?"selected":""}>${t.name} (${t.func})</option>`).join("")}</select></div>
+ ${tplSel?tplForm(DOC_TEMPLATES.find(t=>t.id===tplSel)):""}</div>`;
+};
+function tplFields(t){const m=[...t.body.matchAll(/\{\{(\w+)\}\}/g)].map(x=>x[1]);return [...new Set(m)];}
+function tplForm(t){const fields=tplFields(t);const editable=can(t.func,"C");
+ const src=t.src==="staff"?S.master.staff:t.src==="foreigner"?S.master.foreigners:[];
+ return `<div class="row">${t.src!=="none"?`<label>Đối tượng từ dữ liệu chủ: <select id="t_obj" onchange="tplFill()"><option value="">-- chọn --</option>${src.map((o,i)=>`<option value="${i}">${esc(o.HoTen)} (${esc(o.MaNV||o.SoHoChieu||"")})</option>`).join("")}</select></label>`:""}${!src.length&&t.src!=="none"?`<span class="muted">Chưa có dữ liệu chủ - nhập ở mục ${t.src==="staff"?"Nhân sự":"Người nước ngoài"} hoặc điền tay.</span>`:""}</div>
+ <div class="grid2">${fields.map(f=>`<div><label>${f}</label>${f==="NoiDung"||f==="NoiDungJP"?`<textarea id="tf_${f}" style="min-height:60px"></textarea>`:`<input id="tf_${f}" value="${f==="NgayKy"?fmt(today()):f==="SoVanBan"?"":f==="DaiDien"?"":""}">`}</div>`).join("")}</div>
+ <div class="row" style="margin-top:10px"><button class="btn" ${editable?"":"disabled"} onclick="tplGen('${t.id}',0)">Xem trước</button><button class="btn" ${editable?"":"disabled"} onclick="tplGen('${t.id}',1)">Sinh văn bản (.doc)</button>${editable?"":'<span class="muted">Bạn chỉ có quyền xem mẫu này.</span>'}</div><div id="t_prev"></div>`;}
+function tplFill(){const t=DOC_TEMPLATES.find(x=>x.id===tplSel);const src=t.src==="staff"?S.master.staff:S.master.foreigners;const o=src[Number(val("t_obj"))];if(!o)return;for(const k in o){const el=document.getElementById("tf_"+k);if(el)el.value=o[k]||"";}}
+function tplGen(id,dl){const t=DOC_TEMPLATES.find(x=>x.id===id);let body=t.body;const vals={};for(const f of tplFields(t)){vals[f]=val("tf_"+f);body=body.replaceAll(`{{${f}}}`,vals[f]||"________");}
+ if(!vals.SoVanBan){S.seq.vb++;const no=`${String(S.seq.vb).padStart(3,"0")}/${new Date().getFullYear()}/VNT-HCNS`;body=body.replaceAll("________",m=>m);body=body.replace("Số: ________","Số: "+no).replace("No.: ________","No.: "+no);}
+ document.getElementById("t_prev").innerHTML=`<div class="pre" style="margin-top:10px">${esc(body)}</div>`;
+ if(dl){const html=`<html><head><meta charset="utf-8"><style>body{font-family:'Times New Roman';font-size:13pt;white-space:pre-wrap;line-height:1.4}</style></head><body>${esc(body)}</body></html>`;const blob=new Blob(["\ufeff"+html],{type:"application/msword"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`${t.id}-${(vals.HoTen||vals.TrichYeu||"vanban").replace(/[^\w\u00C0-\u1EF9 ]/g,"").slice(0,40)}-${today()}.doc`;a.click();log("Sinh văn bản",t.name+" "+(vals.HoTen||""));save();toast("Đã tải văn bản");}}
+
+/* ---- Kiểm tra chấm công ---- */
+PAGES.ts=()=>hdr("Kiểm tra chấm công theo quy tắc")+
+ `<div class="hint">Dán dữ liệu từ Excel (các cột: Mã NV, Họ tên, Phòng, Giờ công, Giờ OT, Ngày phép, Ngày không lương - cách nhau bằng Tab). Công cụ kiểm tra: thiếu giờ chuẩn tháng, OT bất thường, không có OT (đối chiếu với file 'DS KHONG CO OVER TIME'), phép vượt quỹ. Kết quả là danh sách ngoại lệ để gửi trưởng phòng xác nhận (Flow F-06 giai đoạn 2).</div>
+ <div class="panel"><div class="row"><label>Giờ chuẩn tháng <input type="number" id="ts_std" value="208" style="width:80px"></label><label>Ngưỡng OT cảnh báo (giờ) <input type="number" id="ts_ot" value="40" style="width:80px"></label><label>Quỹ phép còn lại tối thiểu <input type="number" id="ts_leave" value="0" style="width:80px"></label></div>
+ <textarea id="ts_data" style="min-height:140px" placeholder="MaNV	HoTen	Phong	GioCong	OT	Phep	KhongLuong
+VNT001	Nguyễn Văn A	XD	200	12	1	0
+VNT002	Trần Thị B	KT	216	0	0	0"></textarea>
+ <div class="row" style="margin-top:8px"><button class="btn" onclick="tsRun()">Kiểm tra</button><button class="btn sec" onclick="tsSample()">Dữ liệu mẫu</button></div><div id="ts_out"></div></div>`;
+function tsSample(){document.getElementById("ts_data").value="MaNV\tHoTen\tPhong\tGioCong\tOT\tPhep\tKhongLuong\nVNT001\tNguyễn Văn A\tXD\t200\t12\t1\t0\nVNT002\tTrần Thị B\tKT\t216\t0\t0\t0\nVNT003\tLê Văn C\tMEP\t184\t0\t3\t2\nVNT004\tPhạm D\tQS\t208\t52\t0\t0\nVNT005\tHoàng E\tCS\t208\t8\t0\t0";}
+function tsRun(){const std=Number(val("ts_std")),otMax=Number(val("ts_ot"));const lines=val("ts_data").split(/\r?\n/).filter(Boolean);if(lines.length<2)return toast("Dán dữ liệu trước");
+ const hdr=lines[0].split("\t");const idx=n=>hdr.findIndex(h=>h.toLowerCase().replace(/\s/g,"").includes(n));const iH=idx("gio"),iO=idx("ot"),iP=idx("phep"),iK=idx("khong"),iN=idx("hoten"),iM=idx("manv"),iD=idx("phong");
+ const out=[];let n=0;for(const l of lines.slice(1)){const c=l.split("\t");n++;const h=Number(c[iH]||0),ot=Number(c[iO]||0),p=Number(c[iP]||0),k=Number(c[iK]||0);const issues=[];
+  if(h+p*8+k*8<std)issues.push(`Thiếu ${std-h-p*8-k*8}h so với giờ chuẩn ${std}h`);if(h>std)issues.push(`Giờ công ${h} > giờ chuẩn - kiểm tra có tính nhầm OT vào giờ công`);if(ot>otMax)issues.push(`OT ${ot}h vượt ngưỡng ${otMax}h - cần xác nhận`);if(ot===0)issues.push("Không có OT - đối chiếu DS không OT");if(k>0)issues.push(`${k} ngày không lương - kiểm tra đơn`);
+  if(issues.length)out.push([c[iM],c[iN],c[iD],h,ot,p,k,issues]);}
+ document.getElementById("ts_out").innerHTML=`<p style="margin:12px 0 6px"><b>${n}</b> nhân sự, <b>${out.length}</b> ngoại lệ</p><table><tr><th>Mã</th><th>Họ tên</th><th>Phòng</th><th>Giờ</th><th>OT</th><th>Phép</th><th>K.lương</th><th>Ngoại lệ</th></tr>${out.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7].map(x=>`<span class="tag ${x.startsWith("Thiếu")||x.startsWith("OT")?"t-red":"t-yel"}">${x}</span>`).join(" ")}</td></tr>`).join("")}</table><div class="row" style="margin-top:8px"><button class="btn sec" onclick="tsExport()">Xuất danh sách ngoại lệ (CSV)</button></div>`;window._tsOut=out;log("Kiểm tra chấm công",`${n} NS, ${out.length} ngoại lệ`);}
+function tsExport(){const rows=[["MaNV","HoTen","Phong","GioCong","OT","Phep","KhongLuong","NgoaiLe"],...(window._tsOut||[]).map(r=>[...r.slice(0,7),r[7].join("; ")])];dlCSV(rows,"ngoai-le-cham-cong-"+today()+".csv");}
+
+/* ---- Dữ liệu chủ ---- */
+const MASTER={
+ staff:{title:"Nhân sự (HR master)",func:"F03",fields:["MaNV","ACC","HoTen","NgaySinh","GioiTinh","QuocTich","CCCD","DiaChi","ChucDanh","Position","DonVi","KhoiPhong","Site","DuAn","LoaiHD","NgayVao","NgayHieuLuc","DenNgay","Luong","SoTaiKhoan","MaBHXH","Email","DienThoai","BanAnToan","TrangThai"],sens:["CCCD","Luong","SoTaiKhoan","DiaChi","NgaySinh","MaBHXH"]},
+ foreigners:{title:"Người nước ngoài (Foreigner registry)",func:"F08",fields:["MaHS","HoTen","QuocTich","GioiTinh","NgaySinh","SoHoChieu","NgayCapHoChieu","HanHoChieu","ChucDanh","DuAn","HinhThuc","SoGPLD","HanGPLD","SoTRC","HanTRC","HanVisa","DiaChiVN","NguoiUyQuyen","ChiNhanh","GhiChu"],sens:["NgaySinh","DiaChiVN"]},
+ cars:{title:"Xe & hợp đồng thuê",func:"F10",fields:["BienSo","LoaiXe","SoHuu","NhaCungCap","HopDong","HanHopDong","HanDangKiem","HanBaoHiem","LaiXe","DonViSuDung","GhiChu"],sens:[]},
+ assets:{title:"Thiết bị IT",func:"F12",fields:["MaTS","Loai","Hang","Serial","NguoiDung","DonVi","NgayBanGiao","HanBaoHanh","License","HanLicense","TrangThai","GhiChu"],sens:[]},
+ certs:{title:"Chứng chỉ & Đào tạo",func:"F07",fields:["HoTen","PhongBan","LoaiCC","LinhVuc","Hang","SoCC","TuNgay","DenNgay","NguonSheet","GhiChu"],sens:[]},
+ insurance:{title:"Bảo hiểm (công ty & công trình)",func:"F09",fields:["Loai","NhaBH","DoiTuong","GiaTri","Phi","SoNguoiXe","TuNgay","DenNgay","GhiChu"],sens:["Phi","GiaTri"]},
+ projects:{title:"Dự án (Project master)",func:"F04",fields:["MaDA","TenDA","NhomDA","KhachHang","TuNgay","DenNgay","TrangThai","GhiChu"],sens:[]}};
+let mq={};
+function masterPage(k){const m=MASTER[k];const q=(mq[k]||"").toLowerCase();const all=S.master[k];const rows=all.map((r,i)=>[r,i]).filter(([r])=>!q||Object.values(r).join(" ").toLowerCase().includes(q));const ed=can(m.func,"E"),ad=can(m.func,"C");const showSens=can(m.func,"E")||isGM();
+ return hdr(m.title,(ad?`<button class="btn" onclick="mForm('${k}')">+ Thêm</button> `:"")+(ad?`<button class="btn sec" onclick="mImport('${k}')">Nhập từ Excel (dán TSV)</button> `:"")+`<button class="btn sec" onclick="exportCSV('${k}')">Xuất CSV</button>`)+
+ `<div class="hint">Một nguồn sự thật. ${m.sens.length?"Trường nhạy cảm ("+m.sens.join(", ")+") chỉ hiển thị cho người có quyền E/A của "+m.func+" theo Luật BVDLCN.":""} Các cột hạn (Han...) nên đồng thời được đưa vào Trung tâm hạn hiệu lực bằng nút 'Đẩy hạn'.</div>
+ <div class="row"><input placeholder="Tìm trong bảng..." value="${esc(mq[k]||"")}" onchange="mq['${k}']=this.value;go(PAGE)" style="width:280px"><span class="muted">${rows.length} / ${all.length} dòng${rows.length>400?" - hiển thị 400 dòng đầu, dùng ô tìm để lọc":""}</span>${can(m.func,"E")?`<button class="btn sm sec" onclick="mPushAll('${k}')">Đẩy hạn tất cả</button>`:""}${k==="foreigners"&&can("F08","V")?`<button class="btn sm sec" onclick="exportMau14()">Xuất Mẫu 14/PLI (.doc)</button>`:""}</div>
+ <div class="panel" style="overflow:auto"><table><tr>${m.fields.map(f=>`<th>${f}</th>`).join("")}<th></th></tr>${rows.slice(0,400).map(([r,i])=>`<tr>${m.fields.map(f=>`<td class="${m.sens.includes(f)&&!showSens?"sens":""}">${m.sens.includes(f)&&!showSens?"••••":esc(r[f]||"")}</td>`).join("")}<td style="white-space:nowrap">${ed?`<button class="btn sm sec" onclick="mForm('${k}',${i})">Sửa</button> <button class="btn sm sec" onclick="mPush('${k}',${i})">Đẩy hạn</button> <button class="btn sm dan" onclick="mDel('${k}',${i})">Xóa</button>`:""}</td></tr>`).join("")||`<tr><td colspan="${m.fields.length+1}" class="muted">Chưa có dữ liệu. Nhập tay hoặc dán từ Excel (hàng đầu là tên cột trùng tên trường).</td></tr>`}</table></div>`;}
+PAGES.staff=()=>masterPage("staff");PAGES.certs=()=>masterPage("certs");PAGES.insurance=()=>masterPage("insurance");PAGES.projects=()=>masterPage("projects");PAGES.foreign=()=>masterPage("foreigners");PAGES.cars=()=>masterPage("cars");PAGES.assets=()=>masterPage("assets");
+function mForm(k,i){const m=MASTER[k];const r=i!=null?S.master[k][i]:{};modal(`<h3>${i!=null?"Sửa":"Thêm"} - ${m.title}</h3><div class="grid2">${m.fields.map(f=>`<div><label>${f}</label><input id="m_${f}" value="${esc(r[f]||"")}" ${/^(Ngay|Han|Den)/.test(f)?'placeholder="YYYY-MM-DD"':""}></div>`).join("")}</div><div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="mSave('${k}',${i==null?-1:i})">Lưu</button></div>`);}
+function mPushAll(k){const n=S.master[k].length;for(let i=0;i<n;i++)mPush(k,i,true);save();go(PAGE);toast("Đã đẩy hạn cho "+n+" dòng");}
+function mSave(k,i){const m=MASTER[k];const o={};m.fields.forEach(f=>o[f]=val("m_"+f));if(!o[m.fields[0]]&&!o.HoTen)return toast("Thiếu trường đầu");if(i>=0)S.master[k][i]=o;else S.master[k].push(o);log("Dữ liệu chủ "+k,i>=0?"sửa":"thêm");save();closeModal();go(PAGE);}
+function mDel(k,i){if(!confirm("Xóa dòng?"))return;S.master[k].splice(i,1);log("Xóa dữ liệu chủ "+k,"");save();go(PAGE);}
+function mImport(k){modal(`<h3>Nhập từ Excel - ${MASTER[k].title}</h3><p class="muted">Trong Excel, đặt hàng đầu là tên cột trùng với tên trường (${MASTER[k].fields.join(", ")}), chọn vùng, Ctrl+C rồi dán vào đây. Ngày theo YYYY-MM-DD.</p><textarea id="mi_data" style="min-height:200px"></textarea><div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="mImportRun('${k}')">Nhập</button></div>`);}
+function mImportRun(k){const lines=val("mi_data").split(/\r?\n/).filter(Boolean);if(lines.length<2)return toast("Không có dữ liệu");const hdr=lines[0].split("\t").map(h=>h.trim());let n=0;for(const l of lines.slice(1)){const c=l.split("\t");const o={};hdr.forEach((h,i)=>{if(MASTER[k].fields.includes(h))o[h]=(c[i]||"").trim();});if(Object.keys(o).length){S.master[k].push(o);n++;}}log("Nhập dữ liệu chủ "+k,n+" dòng");save();closeModal();go(PAGE);toast("Đã nhập "+n+" dòng");}
+function mPush(k,i,silent){const r=S.master[k][i];let map={HanHoChieu:"PASSPORT",HanGPLD:"GPLD",HanTRC:"TRC",HanVisa:"VISA",DenNgay:"HDLD",HanHopDong:"HD-THUE",HanDangKiem:"XE-DK",HanBaoHiem:"XE-BH",HanBaoHanh:"LICENSE",HanLicense:"LICENSE"};if(k==="certs")map={DenNgay:/ATVSL/.test(r.LoaiCC)?"CC-ATLD":/ISO/.test(r.LoaiCC)?"CC-ISO":"CC-HN"};if(k==="insurance")map={DenNgay:/CAR|Open|Project|MSIG/i.test(r.Loai+r.NhaBH)?"BH-CAR":"BH-YT"};if(k==="projects")map={DenNgay:"BH-CAR"};let n=0;const name=r.HoTen||r.BienSo||r.MaTS||r.TenDA||r.Loai;
+ for(const f in map){if(r[f]&&/^\d{4}-\d{2}-\d{2}$/.test(r[f])){const obj=`${name} - ${f}`;if(!S.expiries.some(e=>e.status!=="done"&&e.type===map[f]&&e.date===r[f]&&e.obj.toLowerCase().includes(String(name).toLowerCase().slice(0,15)))){S.expiries.push({id:uid(),type:map[f],obj,date:r[f],pic:ME,note:"Từ dữ liệu chủ",status:"open",created:today()});n++;}}}
+ if(silent)return; log("Đẩy hạn từ dữ liệu chủ",name+" "+n);save();toast(`Đã đẩy ${n} hạn vào Trung tâm hạn`);}
+
+function exportMau14(){const rows=S.master.foreigners;const now=new Date();const html=`<html><head><meta charset="utf-8"><style>body{font-family:'Times New Roman';font-size:11pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:3px;font-size:9pt;vertical-align:top}</style></head><body><p style="text-align:right">Mẫu số 14/PLI</p><p style="text-align:center"><b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>Độc lập - Tự do - Hạnh phúc</b></p><p style="text-align:right"><i>Hà Nội, ngày ${now.getDate()} tháng ${now.getMonth()+1} năm ${now.getFullYear()}</i></p><p style="text-align:center"><b>SỔ THEO DÕI NGƯỜI LAO ĐỘNG NƯỚC NGOÀI</b><br>Công ty TNHH Quốc tế VINATA - Kỳ ${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}</p><table><tr><th>STT</th><th>Ngày ghi sổ</th><th>Họ và tên</th><th>Năm sinh</th><th>Quốc tịch</th><th>Hộ chiếu</th><th>Vị trí công việc</th><th>Chức danh</th><th>Hình thức làm việc</th><th>GPLĐ (hạn)</th><th>Không thuộc diện cấp GPLĐ</th><th>GPLĐ bị thu hồi</th></tr>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${fmt(today())}</td><td>${esc(r.HoTen)}</td><td>${(r.NgaySinh||"").slice(0,4)}</td><td>${esc(r.QuocTich)}</td><td>${esc(r.SoHoChieu)}</td><td>${esc(r.DuAn)}</td><td>${esc(r.ChucDanh)}</td><td>${esc(r.HinhThuc)}</td><td>${r.HinhThuc==="Miễn GPLĐ"?"":fmt(r.HanGPLD)}</td><td>${r.HinhThuc==="Miễn GPLĐ"?"X - "+fmt(r.HanGPLD):""}</td><td></td></tr>`).join("")}</table><p><br>NGƯỜI LẬP SỔ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NGƯỜI SỬ DỤNG LAO ĐỘNG</p></body></html>`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+html],{type:"application/msword"}));a.download=`Mau-14-PLI-So-theo-doi-LDNN-${today().slice(0,7)}.doc`;a.click();log("Xuất Mẫu 14/PLI","");save();}
+/* ---- PROGRESS 2026 ---- */
+PAGES.progress=()=>{
+ if(!S.progress.length){S.progress=[["PHÁP CHẾ","Bảo vệ dữ liệu cá nhân","H.THỦY","done"],["TUYỂN DỤNG","Mở rộng kênh tuyển dụng","NGUYỆT","done"],["ĐÀO TẠO","Tổ chức đào tạo theo chương trình","H.THỦY","done"],["BẢO HIỂM SK","BH sức khỏe toàn diện cho nhân viên","H.THỦY","done"],["PHÁP CHẾ","Tuyển dụng nhân sự pháp chế","TUẤN","adjust"],["ĐÀO TẠO","Áp dụng Talent Development System","H.THỦY","adjust"],["CHUYỂN ĐỔI SỐ","Phần mềm thanh toán","ĐIỂN","adjust"],["DỰ ÁN VŨ YÊN","Chốt tối thiểu 01 khách 2026","MINH","adjust"],["LƯƠNG THƯỞNG","Cải tổ hệ thống lương","TUẤN","doing"],["LƯƠNG THƯỞNG","Quy chế lương thưởng, nghỉ phép","TUẤN","doing"],["CHUYỂN ĐỔI SỐ","Đào tạo AI","ĐIỂN","doing"],["ISO","Nghiên cứu sửa đổi ISO 2027 theo chuẩn mới","H.THỦY","doing"],["QUY TRÌNH HÓA","Quy trình hóa nghiệp vụ phòng HCNS","TUẤN","doing"],["CUỐI NĂM","Chuyển đổi di chuyển nội bộ","H.THỦY","doing"],["CUỐI NĂM","Đánh giá ISO","TUẤN","doing"],["CUỐI NĂM","Khám sức khỏe","A.DIÊN","doing"],["CUỐI NĂM","Sportsday","A.DIÊN","doing"],["CUỐI NĂM","Year End Party","MINH","doing"],["CUỐI NĂM","Brochure + Lịch + VINATA News","TUẤN","doing"],["CUỐI NĂM","Đánh giá nhân viên","TUẤN","doing"],["CHUYỂN ĐỔI SỐ","Triển khai VINATA HCNS HUB (giai đoạn 1)","ĐIỂN","doing"]].map(r=>({id:uid(),grp:r[0],task:r[1],lead:r[2],st:r[3],note:""}));save();}
+ const st={done:'<span class="tag t-grn">Hoàn thành</span>',doing:'<span class="tag t-blu">Đang thực hiện</span>',adjust:'<span class="tag t-amb">Cần điều chỉnh</span>',add:'<span class="tag t-gry">Bổ sung</span>'};
+ const cnt=s=>S.progress.filter(p=>p.st===s).length;
+ return hdr("PROGRESS 2026 - mục tiêu phòng",`<button class="btn" onclick="prgForm()">+ Thêm mục</button>`)+
+ `<div class="cards"><div class="card g"><div class="v">${cnt("done")}</div><div class="l">Hoàn thành</div></div><div class="card"><div class="v">${cnt("doing")}</div><div class="l">Đang thực hiện</div></div><div class="card a"><div class="v">${cnt("adjust")}</div><div class="l">Cần điều chỉnh</div></div></div>
+ <div class="panel"><table><tr><th>Nhóm</th><th>Mục tiêu</th><th>Lead</th><th>Trạng thái</th><th>Ghi chú</th><th></th></tr>${S.progress.map(p=>`<tr><td>${esc(p.grp)}</td><td>${esc(p.task)}</td><td>${p.lead}</td><td>${st[p.st]||p.st}</td><td>${esc(p.note)}</td><td style="white-space:nowrap"><select class="btn sm sec" onchange="prgSt('${p.id}',this.value)"><option value="">Đổi...</option><option value="doing">Đang thực hiện</option><option value="done">Hoàn thành</option><option value="adjust">Cần điều chỉnh</option><option value="add">Bổ sung</option></select> ${isGM()||p.lead===ME?`<button class="btn sm dan" onclick="prgDel('${p.id}')">Xóa</button>`:""}</td></tr>`).join("")}</table></div>`;
+};
+function prgForm(){modal(`<h3>Thêm mục tiêu</h3><div class="grid2"><div><label>Nhóm</label><input id="p_grp"></div><div><label>Lead</label><select id="p_lead">${USERS.map(u=>`<option>${u[0]}</option>`).join("")}</select></div></div><div class="g1"><label>Mục tiêu</label><input id="p_task"></div><div class="g1"><label>Ghi chú</label><input id="p_note"></div><div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Hủy</button><button class="btn" onclick="prgSave()">Lưu</button></div>`);}
+function prgSave(){if(!val("p_task"))return toast("Nhập mục tiêu");S.progress.push({id:uid(),grp:val("p_grp"),task:val("p_task"),lead:val("p_lead"),st:"doing",note:val("p_note")});log("PROGRESS thêm",val("p_task"));save();closeModal();go("progress");}
+function prgSt(id,v){if(!v)return;const p=S.progress.find(x=>x.id===id);p.st=v;log("PROGRESS trạng thái",p.task+" → "+v);save();go("progress");}
+function prgDel(id){if(!confirm("Xóa?"))return;S.progress=S.progress.filter(x=>x.id!==id);save();go("progress");}
+
+/* ---- KPI ---- */
+PAGES.kpi=()=>{
+ const open=S.expiries.filter(e=>e.status==="open");const over=open.filter(e=>daysTo(e.date)<0).length,s30=open.filter(e=>{const n=daysTo(e.date);return n>=0&&n<=30;}).length;
+ const reqs=S.requests;const pend=reqs.filter(r=>r.status==="pending").length;const gmShare=reqs.length?Math.round(reqs.filter(r=>r.approver==="TUẤN"||r.needGM).length/reqs.length*100):0;
+ const lead=reqs.filter(r=>r.approvedAt).map(r=>daysTo(r.approvedAt)-daysTo(r.date));const avgLead=lead.length?(lead.reduce((a,b)=>a+b,0)/lead.length).toFixed(1):"-";
+ const docsIn=S.docs.filter(d=>d.dir==="in");const docLate=docsIn.filter(d=>d.status!=="done"&&d.due&&daysTo(d.due)<0).length;
+ const sopSteps=S.sops.flatMap(s=>s.steps);const stepLate=sopSteps.filter(st=>!st.done&&daysTo(st.due)<0).length;
+ const byFunc=Object.keys(FUNCS).map(f=>{const e=open.filter(x=>tfunc(EXP_TYPES,x.type)===f);const r=reqs.filter(x=>tfunc(REQ_TYPES,x.type)===f);return [f,FUNCS[f],e.length,e.filter(x=>daysTo(x.date)<0).length,r.length,r.filter(x=>x.status==="pending").length];});
+ const byPic={};open.forEach(e=>{byPic[e.pic]=byPic[e.pic]||{open:0,over:0};byPic[e.pic].open++;if(daysTo(e.date)<0)byPic[e.pic].over++;});
+ const back=[...new Set(Object.values(S.matrix).flatMap(()=>[]))];
+ const cover=Object.keys(FUNCS).map(f=>{const n=USERS.filter(u=>["E","A"].includes(perm(f,u[0]))).length;return [f,n];});
+ return hdr("Báo cáo KPI phòng HCNS",`<button class="btn sec" onclick="window.print()">In / PDF</button>`)+
+ `<p class="muted">Sinh tự động từ dữ liệu HUB lúc ${new Date().toLocaleString("vi")}. Giai đoạn 2: Flow F-10 gửi báo cáo này lên Teams mỗi sáng thứ Hai.</p>
+ <div class="cards"><div class="card r"><div class="v">${over}</div><div class="l">Hạn quá hạn</div></div><div class="card a"><div class="v">${s30}</div><div class="l">Hạn ≤30 ngày</div></div><div class="card"><div class="v">${open.length}</div><div class="l">Hạn đang theo dõi</div></div><div class="card a"><div class="v">${pend}</div><div class="l">Yêu cầu chờ duyệt</div></div><div class="card"><div class="v">${avgLead}</div><div class="l">Ngày duyệt TB</div></div><div class="card ${gmShare>30?"r":"g"}"><div class="v">${gmShare}%</div><div class="l">Tỷ lệ cần GM duyệt (mục tiêu ≤30%)</div></div><div class="card ${docLate?"r":"g"}"><div class="v">${docLate}</div><div class="l">Công văn đến quá hạn</div></div><div class="card ${stepLate?"r":"g"}"><div class="v">${stepLate}</div><div class="l">Bước quy trình trễ</div></div></div>
+ <div class="panel"><h3>Theo lĩnh vực</h3><table><tr><th>Mã</th><th>Lĩnh vực</th><th>Hạn theo dõi</th><th>Quá hạn</th><th>Yêu cầu</th><th>Chờ duyệt</th><th>Số người EDIT/APPROVE</th></tr>${byFunc.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]?`<span class="tag t-red">${r[3]}</span>`:0}</td><td>${r[4]}</td><td>${r[5]}</td><td>${cover[i][1]<3?`<span class="tag t-amb">${cover[i][1]} - thiếu dự phòng</span>`:cover[i][1]}</td></tr>`).join("")}</table></div>
+ <div class="panel"><h3>Theo người (hạn đang theo dõi)</h3><table><tr><th>PIC</th><th>Đang theo dõi</th><th>Quá hạn</th></tr>${Object.entries(byPic).sort((a,b)=>b[1].open-a[1].open).map(([p,v])=>`<tr><td>${p}</td><td>${v.open}</td><td>${v.over?`<span class="tag t-red">${v.over}</span>`:0}</td></tr>`).join("")||'<tr><td colspan="3" class="muted">Chưa có</td></tr>'}</table></div>
+ <div class="panel"><h3>Hoạt động 7 ngày gần nhất</h3><p class="muted">${S.log.filter(l=>(Date.now()-new Date(l.t))<7*86400000).length} thao tác được ghi nhận bởi ${[...new Set(S.log.filter(l=>(Date.now()-new Date(l.t))<7*86400000).map(l=>l.u))].length} người.</p></div>`;
+};
+
+/* ---- Ma trận ---- */
+PAGES.matrix=()=>{
+ const ed=isGM();
+ return hdr("Ma trận phân quyền chức năng (Người × F01-F12)",ed?`<button class="btn sec" onclick="matrixReset()">Khôi phục mặc định</button> <button class="btn sec" onclick="exportCSV('matrix')">Xuất CSV</button>`:"")+
+ `<div class="hint">A = Phê duyệt (gồm sửa), E = Sửa/xóa, C = Thêm (không xóa), V = Xem, - = Không. ${ed?"GM bấm vào ô để đổi quyền; mỗi thay đổi được ghi nhật ký. Dùng bảng này để tạo nhóm bảo mật M365 SG-HCNS-Fxx-EDIT/VIEW.":"Chỉ GM được sửa. Lĩnh vực có dưới 3 người E/A được đánh dấu thiếu dự phòng."}</div>
+ <div class="panel" style="overflow:auto"><table><tr><th>Người</th>${Object.keys(FUNCS).map(f=>`<th title="${FUNCS[f]}">${f}</th>`).join("")}</tr>${USERS.map(u=>`<tr><td><b>${u[0]}</b><br><small class="muted">${u[1]}</small></td>${Object.keys(FUNCS).map(f=>{const p=perm(f,u[0]);return `<td style="text-align:center"><span class="perm p${p}" ${ed?`style="cursor:pointer" onclick="matrixCycle('${u[0]}','${f}')"`:""}>${p}</span></td>`;}).join("")}</tr>`).join("")}
+ <tr><td><b>Người E/A</b></td>${Object.keys(FUNCS).map(f=>{const n=USERS.filter(u=>["E","A"].includes(perm(f,u[0]))).length;return `<td style="text-align:center">${n<3?`<span class="tag t-amb">${n}</span>`:n}</td>`;}).join("")}</tr></table></div>
+ <div class="panel"><h3>Lĩnh vực</h3><table><tr><th>Mã</th><th>Lĩnh vực</th><th>Thư mục SharePoint đề xuất</th></tr>${Object.keys(FUNCS).map(f=>`<tr><td>${f}</td><td>${FUNCS[f]}</td><td>HCNS-OPERATIONS/${f}-${FUNCS[f].normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/[^A-Za-z0-9]+/g,"-").toUpperCase()}</td></tr>`).join("")}</table></div>`;
+};
+function matrixCycle(u,f){const order=["-","V","C","E","A"];const p=perm(f,u);const np=order[(order.indexOf(p)+1)%order.length];S.matrix[u]=S.matrix[u]||{};S.matrix[u][f]=np;log("Đổi quyền",`${u} ${f}: ${p} → ${np}`);save();go("matrix");}
+function matrixReset(){if(!confirm("Khôi phục ma trận mặc định theo Admin.xlsx?"))return;S.matrix=JSON.parse(JSON.stringify(MATRIX_DEFAULT));log("Khôi phục ma trận","");save();go("matrix");}
+
+/* ---- Nhật ký & Sao lưu ---- */
+PAGES.log=()=>hdr("Nhật ký & Sao lưu",`${SSO?`<button class="btn" onclick="pushState(true).then(()=>{toast('Đã sao lưu lên SharePoint');go('log')}).catch(e=>toast(e.message))">☁ Sao lưu lên SharePoint ngay</button> <button class="btn sec" onclick="pullState().then(()=>go('log')).catch(e=>toast(e.message))">☁ Tải bản dùng chung</button> `:""}<button class="btn sec" onclick="exportJSON()">⬇ Xuất JSON (sao lưu)</button> <button class="btn sec" onclick="importJSON()">⬆ Nhập JSON</button> ${isGM()||can("F12","A")?`<button class="btn dan" onclick="wipeDemo()">Xóa dữ liệu mẫu</button>`:""}`)+
+ `<div class="hint">${SSO?`<b>Đăng nhập M365:</b> mọi thay đổi tự đồng bộ lên SharePoint ${esc(HUBCFG.sitePath)}/${HUBCFG.backupFolder}/${HUBCFG.stateFile} sau 8 giây (nơi 1, dùng chung cho cả phòng); nút "Sao lưu ngay" tạo thêm bản có ngày giờ (nơi 2). Lần đồng bộ gần nhất: <b>${S.savedAt?new Date(S.savedAt).toLocaleString("vi")+" bởi "+(S.savedBy||""):"chưa có"}</b>.<br>`:""}<b>Quy tắc sao lưu 2 nơi:</b> sau mỗi ngày làm việc, bấm Xuất JSON và lưu file vào (1) SharePoint: Administration-Human Resources - Documents / PUBLIC ALL / TU DONG HOA HCNS / BACKUP và (2) máy IT (Điển). Lần sao lưu gần nhất: <b>${S.lastBackup?new Date(S.lastBackup).toLocaleString("vi"):"chưa có"}</b>. Dữ liệu bản 1 nằm trong trình duyệt của máy này; muốn dùng chung nhiều máy, nhập cùng một file JSON hoặc chuyển lên SharePoint Lists ở giai đoạn 2.</div>
+ <div class="cards"><div class="card"><div class="v">${S.expiries.length}</div><div class="l">Hạn</div></div><div class="card"><div class="v">${S.docs.length}</div><div class="l">Công văn</div></div><div class="card"><div class="v">${S.requests.length}</div><div class="l">Yêu cầu</div></div><div class="card"><div class="v">${S.sops.length}</div><div class="l">Hồ sơ quy trình</div></div><div class="card"><div class="v">${S.master.staff.length+S.master.foreigners.length+S.master.cars.length+S.master.assets.length}</div><div class="l">Dòng dữ liệu chủ</div></div><div class="card"><div class="v">${S.log.length}</div><div class="l">Dòng nhật ký</div></div></div>
+ <div class="panel"><h3>Nhật ký thao tác (mới nhất)</h3><table><tr><th>Thời gian</th><th>Người</th><th>Hành động</th><th>Chi tiết</th></tr>${S.log.slice(0,200).map(l=>`<tr><td>${new Date(l.t).toLocaleString("vi")}</td><td>${l.u}</td><td>${esc(l.a)}</td><td>${esc(l.d)}</td></tr>`).join("")}</table></div>`;
+function exportJSON(){S.lastBackup=new Date().toISOString();save();const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`VINATA-HCNS-HUB-backup-${new Date().toISOString().replace(/[:T]/g,"-").slice(0,16)}.json`;a.click();log("Sao lưu JSON","");toast("Đã xuất - hãy lưu vào 2 nơi");go("log");}
+function importJSON(){const i=document.createElement("input");i.type="file";i.accept=".json";i.onchange=()=>{const f=i.files[0];const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.matrix||!d.expiries)throw new Error("Không đúng định dạng");if(!confirm("Thay toàn bộ dữ liệu hiện tại bằng file sao lưu?"))return;S=d;save();log("Khôi phục từ JSON",f.name);renderNav();go("log");toast("Đã nhập");}catch(e){toast("Lỗi: "+e.message);}};r.readAsText(f);};i.click();}
+function wipeDemo(){if(!confirm("Xóa các dòng có đánh dấu [MẪU]?"))return;S.expiries=S.expiries.filter(e=>!e.obj.startsWith("[MẪU]"));log("Xóa dữ liệu mẫu","");save();go("log");}
+
+/* ---- Hướng dẫn ---- */
+PAGES.help=()=>hdr("Hướng dẫn nhanh")+`<div class="panel">
+<h3>1. Nguyên tắc</h3><ul><li>Bạn chỉ thấy module và dữ liệu thuộc lĩnh vực mình có quyền (ma trận F01-F12 từ Admin.xlsx). GM thấy tất cả và là người duy nhất sửa ma trận.</li><li>Mọi việc có chủ - hạn - trạng thái - bằng chứng. Mọi thao tác được ghi nhật ký.</li><li>Nhập một lần, dùng nhiều lần: dữ liệu chủ sinh văn bản, hạn, báo cáo.</li></ul>
+<h3>2. Bắt đầu trong 30 phút</h3><ol><li>Vào <b>Nhật ký & Sao lưu</b> → <b>Xóa dữ liệu mẫu</b> (GM hoặc IT).</li><li>H.Thủy / Thúy: dán danh sách người nước ngoài từ 'List of Foreigners' vào <b>Người nước ngoài</b> (Nhập từ Excel), bấm <b>Đẩy hạn</b> từng người.</li><li>Liêm: dán HR master; A.Diên: nhập chứng chỉ ATLĐ vào <b>Trung tâm hạn</b>; Minh: nhập xe.</li><li>Nguyệt: bắt đầu ghi công văn vào <b>Sổ công văn</b>; Hoa: dán bảng công tháng vào <b>Kiểm tra chấm công</b>.</li><li>Mọi người: gửi yêu cầu qua <b>Yêu cầu nội bộ</b> thay vì nhắn tin.</li><li>Cuối ngày: <b>Xuất JSON</b> và lưu 2 nơi.</li></ol>
+<h3>3. Phân quyền</h3><p>A = Phê duyệt, E = Sửa/xóa, C = Thêm (không xóa), V = Xem, - = Không. Yêu cầu vượt ngưỡng (nghỉ phép > ${S.thresholds.LEAVE} ngày, chi phí > ${S.thresholds.STATIONERY.toLocaleString("vi")} đ, văn bản nhân sự, hồ sơ NNN, công văn đi) luôn cần GM.</p>
+<h3>4. Giai đoạn 2</h3><p>Điển chuyển dữ liệu (JSON/CSV) lên SharePoint Lists, bật 12 flow Power Automate (nhắc hạn, phê duyệt Teams, công văn, sinh văn bản, chấm công, đặt xe, DOCO, đào tạo, báo cáo tuần, sao lưu, ký số). Giao diện HUB giữ nguyên, nhúng trong Teams.</p>
+<p class="muted">Bản quyền: Nguyễn Duy Điển - Tài liệu nội bộ VINATA International Co., Ltd. - v1.0 (22/10/2026)</p></div>`;
+
+/* ---- Xuất CSV ---- */
+function dlCSV(rows,name){const csv=rows.map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv"}));a.download=name;a.click();}
+function exportCSV(what){let rows;if(what==="expiries")rows=[["Loại","Lĩnh vực","Đối tượng","Hạn","Còn (ngày)","PIC","Ghi chú","Trạng thái"],...S.expiries.map(e=>[tname(EXP_TYPES,e.type),tfunc(EXP_TYPES,e.type),e.obj,e.date,daysTo(e.date),e.pic,e.note,e.status])];
+ else if(what==="docs")rows=[["Số","Chiều","Ngày","Ký hiệu","Nơi gửi/nhận","Trích yếu","Phân phối","Hạn","File","Trạng thái"],...S.docs.map(d=>[d.no,d.dir,d.date,d.ref,d.party,d.subject,d.assign,d.due,d.file,d.status])];
+ else if(what==="handovers")rows=[["Ngày","Người nhận","Chứng từ","NCC","Số HĐ","Ngày HĐ","Số tiền","Lĩnh vực","Xác nhận","Người xác nhận"],...S.handovers.map(h=>[h.date,h.to,h.doc,h.vendor,h.inv,h.invDate,h.amount,h.func,h.confirmed?"x":"",h.confirmedBy||""])];
+ else if(what==="matrix")rows=[["Người",...Object.keys(FUNCS)],...USERS.map(u=>[u[0],...Object.keys(FUNCS).map(f=>perm(f,u[0]))])];
+ else if(MASTER[what])rows=[MASTER[what].fields,...S.master[what].map(r=>MASTER[what].fields.map(f=>r[f]||""))];
+ dlCSV(rows,`${what}-${today()}.csv`);log("Xuất CSV",what);}
+</script>
+</body>
+</html>
